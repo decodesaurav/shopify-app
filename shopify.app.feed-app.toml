@@ -1,0 +1,28 @@
+# Learn more about configuring your app at https://shopify.dev/docs/apps/tools/cli/configuration
+
+name = "feed-app"
+client_id = "ae7ec1a608904c8460207757b61c9d38"
+application_url = "https://awareness-promptly-whole-industries.trycloudflare.com"
+embedded = true
+
+[access_scopes]
+# Learn more at https://shopify.dev/docs/apps/tools/cli/configuration#access_scopes
+scopes = "write_products"
+
+[auth]
+redirect_urls = [
+  "https://awareness-promptly-whole-industries.trycloudflare.com/auth/callback",
+  "https://awareness-promptly-whole-industries.trycloudflare.com/auth/shopify/callback",
+  "https://awareness-promptly-whole-industries.trycloudflare.com/api/auth/callback",
+  "https://awareness-promptly-whole-industries.trycloudflare.com/.shopify/graphiql/auth/callback"
+]
+
+[webhooks]
+api_version = "2023-10"
+
+[pos]
+embedded = false
+
+[build]
+automatically_update_urls_on_dev = true
+dev_store_url = "test-saurav-store.myshopify.com"
