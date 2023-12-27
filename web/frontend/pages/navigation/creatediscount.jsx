@@ -2,33 +2,31 @@ import {Layout,
 		Page,
 		LegacyCard,
 		TextField,
-		Link,
 		RadioButton,
 		OptionList,
-		Modal,
-		Frame,
-		Banner,
-		Divider} from '@shopify/polaris';
+} from '@shopify/polaris';
 import {React,useState, useCallback} from 'react';
 import { useTranslation } from 'react-i18next';
-import {CodeComponent } from '../../components/CodeComponent';
+import {CodeComponent } from '../../components/create-discount/CodeComponent';
 import AdvancedSetting from '../../components/create-discount/AdvancedSetting';
-import { SelectDiscount } from "../../components/AutoComplete";
+import AdvancedCodeComponent from '../../components/create-discount/AdvancedCodeComponent';
+import DiscountDetailsComponent from '../../components/create-discount/DiscountDetails';
+import DiscountCodePreview from '../../components/create-discount/DiscountCodePreview';
 
 export default function CreateDiscount() {
 	const {t} = useTranslation();
-	const [title, setTitle] = useState('');
 	const [value, setValue] = useState('disabled');
 	const [numberOfCode, setNumberOfCode] = useState('1');
+	const [numberOfCodeDiscount, setNumberOfCodeDiscount] = useState('1');
+
 	const [textFieldValuePattern, setTextFieldValuePattern] = useState('[8LN]');
 	const [advancedCheckValue, setAdvancedValue] = useState([]);
 	const [modalValue, setModalValueActive] = useState(false);
 
 
-	const handleTitleChange = useCallback((value) => setTitle(value), [title]);
 	const radioChange = useCallback((_, newValue) => setValue(newValue), []);
 	const handleDiscountCodeChange = useCallback((newValue) =>{
-	const validValue = Math.max(1,newValue);
+	const validValue = Math.min(1000, Math.max(1, newValue));
 		setNumberOfCode(validValue);
 	}, []);
 	const handleAdvancedRadioChange = useCallback((_, selected) => setAdvancedValue(selected), []);
@@ -45,22 +43,7 @@ export default function CreateDiscount() {
 		>
 		<Layout>
 			<Layout.Section>
-				<LegacyCard title="Discount details" sectioned>
-					<div style={{ marginBottom: '16px' }}>
-						<TextField
-							value={title}
-							onChange={handleTitleChange}
-							label="Title"
-							type="title"
-							placeholder="Example: Black Friday 2023"
-						/>
-					</div>
-					<SelectDiscount />
-					<div style={{ marginTop: '16px' }}>
-						<Link url="https://help.shopify.com/manual">Create New Discount</Link>
-					</div>
-				</LegacyCard>
-
+				<DiscountDetailsComponent />
 				<LegacyCard title="Codes" sectioned>
 					<div style={{ marginBottom: '16px' }}>
 						<div style={{ display: 'flex', flexDirection: 'column' }}>
@@ -92,63 +75,17 @@ export default function CreateDiscount() {
 								/>
 							</Layout.Section>
 							{ ! advancedCheckValue.includes('advanced_pattern') ? (
-								<CodeComponent />
+								<CodeComponent
+									numberOfCodeDiscount={numberOfCodeDiscount}
+									setNumberOfCodeDiscount={setNumberOfCodeDiscount}
+								/>
 								) : (
-									<>
-										<Layout.Section>
-											<TextField
-												label="Pattern"
-												type="text"
-												value={textFieldValuePattern}
-												onChange={handleFieldValuePattern}
-											/>
-											<Link onClick={popupHandler}>Need help choosing a pattern?</Link>
-											{ modalValue && (
-												<>
-													<div style={{height: '500px'}}>
-														<Frame>
-															<Modal
-																activator={modalValue}
-																open={modalValue}
-																onClose={popupHandler}
-																title="Pattern Examples"
-																primaryAction={{
-																	content: 'Close',
-																	onAction: popupHandler,
-																}}
-															>
-																<Modal.Section>
-																	<ul>
-																		<li>
-																			<b>[3LN]</b> generates 3 random letters and numbers.														
-																		</li>
-																		<li>
-																			<b>[3L]</b> generates 3 random letters and numbers.														
-																		</li>
-																		<li>
-																			<b>[3N]</b> generates 3 random letters and numbers.														
-																		</li>
-																	</ul>
-																	<Divider borderColor="border" />
-																	<ul>
-																		<li>
-																			<b>e.g. BLACKFRIDAY-[6LN] </b> could generate a code such as BLACKFRIDAY-3Q4F5A
-																		</li>
-																		<li>
-																			<b>e.g. [3N]-[3N]-[3N] </b> could generate a code such as 123-456-789
-																		</li>
-																		<li>
-																			<b>e.g. FB-[5L]-20OFF</b> could generate a code such as FB-ABCDE-20OFF
-																		</li>
-																	</ul>
-																</Modal.Section>
-															</Modal>
-														</Frame>
-													</div>
-												</>
-											)}
-										</Layout.Section>
-									</>
+									<AdvancedCodeComponent
+										textFieldValuePattern={textFieldValuePattern}
+										handleFieldValuePattern={handleFieldValuePattern}
+										popupHandler={popupHandler}
+										modalValue={modalValue}
+									/>
 								)
 							}
 						</Layout>
@@ -164,6 +101,7 @@ export default function CreateDiscount() {
 						</div>
 					</div>
 				</LegacyCard>
+
 				<LegacyCard sectioned>
 					<Layout>
 						<Layout.Section>
@@ -171,6 +109,7 @@ export default function CreateDiscount() {
 						</Layout.Section>
 					</Layout>
 				</LegacyCard>
+
 				<div style={{marginBottom:'60px'}} ></div>
 			</Layout.Section>
 			<Layout.Section variant="oneThird" secondary>
@@ -179,11 +118,9 @@ export default function CreateDiscount() {
 						<p>Add information of the discount coupon here.</p>
 					</LegacyCard>
 				</div>
-				<div id='discountPreview' style={{marginTop: '20px'}}>
-					<LegacyCard title="Preview" sectioned>
-						<p>You'll see the example of code being generated here!</p>
-					</LegacyCard>
-				</div>
+				<DiscountCodePreview
+					numberOfCodeDiscount={numberOfCodeDiscount}
+				/>
 			</Layout.Section>
 			</Layout>
 		</Page>

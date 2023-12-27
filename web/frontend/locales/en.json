@@ -18,7 +18,9 @@
 	"number_of_codes_to_generate": "Number of Codes To Generate",
 	"number_of_random_letter": "Number of Random Letter and Numbers to Use",
 	"use_advanced_pattern": "Use Advanced Code Pattern",
-	"advanced_section": "Advanced Section"
+	"advanced_section": "Advanced Section",
+	"label1": "Generate Random Codes",
+	"label2": "Import Existing Codes"
   },
   "generate_discount_codes" : "Generate Codes",
   "NotFound": {

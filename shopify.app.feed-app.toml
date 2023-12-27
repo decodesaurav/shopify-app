@@ -2,7 +2,7 @@
 
 name = "feed-app"
 client_id = "ae7ec1a608904c8460207757b61c9d38"
-application_url = "https://awareness-promptly-whole-industries.trycloudflare.com"
+application_url = "https://related-ea-geneva-rev.trycloudflare.com"
 embedded = true
 
 [access_scopes]
@@ -11,10 +11,10 @@ scopes = "write_products"
 
 [auth]
 redirect_urls = [
-  "https://awareness-promptly-whole-industries.trycloudflare.com/auth/callback",
-  "https://awareness-promptly-whole-industries.trycloudflare.com/auth/shopify/callback",
-  "https://awareness-promptly-whole-industries.trycloudflare.com/api/auth/callback",
-  "https://awareness-promptly-whole-industries.trycloudflare.com/.shopify/graphiql/auth/callback"
+  "https://related-ea-geneva-rev.trycloudflare.com/auth/callback",
+  "https://related-ea-geneva-rev.trycloudflare.com/auth/shopify/callback",
+  "https://related-ea-geneva-rev.trycloudflare.com/api/auth/callback",
+  "https://related-ea-geneva-rev.trycloudflare.com/.shopify/graphiql/auth/callback"
 ]
 
 [webhooks]
