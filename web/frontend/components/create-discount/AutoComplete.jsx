@@ -2,7 +2,7 @@ import {Autocomplete, Icon} from '@shopify/polaris';
 import {SearchMinor} from '@shopify/polaris-icons';
 import {useState, useCallback, useMemo} from 'react';
 
-export function SelectDiscount() {
+export function SelectDiscount({ onSelectionChange }) {
   const deselectedOptions = useMemo(
     () => [
       {value: 'rustic', label: 'Rustic'},
@@ -46,8 +46,11 @@ export function SelectDiscount() {
 
       setSelectedOptions(selected);
       setInputValue(selectedValue[0] || '');
+	  if (onSelectionChange) {
+        onSelectionChange(selected);
+      }
     },
-    [options],
+    [options, onSelectionChange, selectedOptions],
   );
 
   const textField = (

@@ -1,7 +1,6 @@
 import { useEffect, useState } from "react";
 
 export const useRandomTextGenerator = (numberOfCode = 5) => {
-	console.log(numberOfCode)
 	const [randomText,setRandomText] = useState(generateRandomText(numberOfCode));
 
 	function generateRandomText(length){

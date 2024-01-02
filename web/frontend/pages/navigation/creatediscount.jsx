@@ -4,25 +4,26 @@ import {Layout,
 		TextField,
 		RadioButton,
 		OptionList,
+		Link
 } from '@shopify/polaris';
 import {React,useState, useCallback} from 'react';
 import { useTranslation } from 'react-i18next';
 import {CodeComponent } from '../../components/create-discount/CodeComponent';
 import AdvancedSetting from '../../components/create-discount/AdvancedSetting';
 import AdvancedCodeComponent from '../../components/create-discount/AdvancedCodeComponent';
-import DiscountDetailsComponent from '../../components/create-discount/DiscountDetails';
-import DiscountCodePreview from '../../components/create-discount/DiscountCodePreview';
+import TitleComponent from '../../components/create-discount/DiscountDetails';
+import SummaryComponent from '../../components/create-discount/SummaryComponent';
+import { SelectDiscount } from '../../components/create-discount/AutoComplete';
 
 export default function CreateDiscount() {
 	const {t} = useTranslation();
 	const [value, setValue] = useState('disabled');
-	const [numberOfCode, setNumberOfCode] = useState('1');
+	const [numberOfCode, setNumberOfCode] = useState('100');
 	const [numberOfCodeDiscount, setNumberOfCodeDiscount] = useState('1');
-
 	const [textFieldValuePattern, setTextFieldValuePattern] = useState('[8LN]');
 	const [advancedCheckValue, setAdvancedValue] = useState([]);
 	const [modalValue, setModalValueActive] = useState(false);
-
+	const [selectedOptionsFromSelect, setSelectedOptionsFromSelect] = useState([]);
 
 	const radioChange = useCallback((_, newValue) => setValue(newValue), []);
 	const handleDiscountCodeChange = useCallback((newValue) =>{
@@ -32,6 +33,10 @@ export default function CreateDiscount() {
 	const handleAdvancedRadioChange = useCallback((_, selected) => setAdvancedValue(selected), []);
 	const handleFieldValuePattern = useCallback((newValue) => setTextFieldValuePattern(newValue) , []);
 	const popupHandler = useCallback(() => setModalValueActive((active) => !active), []);
+
+	const handleSelectionChange = (selectedOptions) => {
+		setSelectedOptionsFromSelect(selectedOptions);
+	};
 
 	return (
 		<Page
@@ -43,7 +48,13 @@ export default function CreateDiscount() {
 		>
 		<Layout>
 			<Layout.Section>
-				<DiscountDetailsComponent />
+				<LegacyCard title="Discount details" sectioned>
+					<TitleComponent />
+					<SelectDiscount onSelectionChange={handleSelectionChange} />
+					<div style={{ marginTop: '16px' }}>
+						<Link url="https://help.shopify.com/manual">Create New Discount</Link>
+					</div>
+				</LegacyCard>
 				<LegacyCard title="Codes" sectioned>
 					<div style={{ marginBottom: '16px' }}>
 						<div style={{ display: 'flex', flexDirection: 'column' }}>
@@ -113,15 +124,9 @@ export default function CreateDiscount() {
 				<div style={{marginBottom:'60px'}} ></div>
 			</Layout.Section>
 			<Layout.Section variant="oneThird" secondary>
-				<div className='dynamicInfo'>
-					<LegacyCard title="Summary" sectioned>
-						<p>Add information of the discount coupon here.</p>
-					</LegacyCard>
-				</div>
-				<DiscountCodePreview
-					numberOfCodeDiscount={numberOfCodeDiscount}
-					advancedPattern={textFieldValuePattern}
-					isAdvancedChecked={advancedCheckValue}
+				<SummaryComponent
+					numberOfCodeDiscount={numberOfCode}
+					selectedOptionsFromSelect={selectedOptionsFromSelect}
 				/>
 			</Layout.Section>
 			</Layout>

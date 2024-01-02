@@ -7,6 +7,7 @@ import {Layout,
 import {React,useState, useCallback} from 'react';
 import { useTranslation } from 'react-i18next';
 import useValidation from '../../hooks/discount-code/useValidation';
+import { useRandomTextGenerator } from '../../hooks/discount-code/generateRandomNumbers';
 
 
 export function CodeComponent({numberOfCodeDiscount, setNumberOfCodeDiscount}) {
@@ -16,6 +17,8 @@ export function CodeComponent({numberOfCodeDiscount, setNumberOfCodeDiscount}) {
 	const [textFieldValueSuffix, setTextFieldValueSuffix] = useState('');
 	const [titleErrorPrefix, setTitleErrorPrefix] = useState('');
 	const [titleErrorSuffix, setTitleErrorSuffix] = useState('');
+
+	const { randomText } = useRandomTextGenerator(numberOfCodeDiscount);
 
 	const handleDiscountCodeChange = useCallback((newValue) =>{
 		const validValue = Math.min(1000,Math.max(1,newValue));
@@ -38,7 +41,7 @@ export function CodeComponent({numberOfCodeDiscount, setNumberOfCodeDiscount}) {
 					placeholder='Example: GF (leave empty space for no prefix)'
 					value={textFieldValuePrefix}
 					onChange={(newValue) => handleFieldChange(newValue, setTextFieldValuePrefix, setTitleErrorPrefix)}
-					helpText={`The code generated will be: ${textFieldValuePrefix}-JUPGRAMM-${textFieldValueSuffix}`}
+					helpText={`The discount code format will be: ${textFieldValuePrefix}-${randomText}-${textFieldValueSuffix}`}
 					autoComplete="email"
 				/>
 				{ titleErrorPrefix && <div style={{ color: 'red' }}>{titleErrorPrefix}</div> }
@@ -59,7 +62,7 @@ export function CodeComponent({numberOfCodeDiscount, setNumberOfCodeDiscount}) {
 					placeholder='Example: 15OFF (leave empty space for no prefix)'
 					value={textFieldValueSuffix}
 					onChange={(newValue) => handleFieldChange(newValue, setTextFieldValueSuffix, setTitleErrorSuffix)}
-					helpText={`The code generated will be: ${textFieldValuePrefix}-JUPGRAMM-${textFieldValueSuffix}`}
+					helpText={`The discount code format will be: ${textFieldValuePrefix}-${randomText}-${textFieldValueSuffix}`}
 					/>
 					{ titleErrorSuffix && <div style={{ color: 'red' }}>{titleErrorSuffix}</div> }
 			</Layout.Section>
