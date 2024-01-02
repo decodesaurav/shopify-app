@@ -2,7 +2,7 @@
 
 name = "feed-app"
 client_id = "ae7ec1a608904c8460207757b61c9d38"
-application_url = "https://related-ea-geneva-rev.trycloudflare.com"
+application_url = "https://garmin-before-they-back.trycloudflare.com"
 embedded = true
 
 [access_scopes]
@@ -11,10 +11,10 @@ scopes = "write_products"
 
 [auth]
 redirect_urls = [
-  "https://related-ea-geneva-rev.trycloudflare.com/auth/callback",
-  "https://related-ea-geneva-rev.trycloudflare.com/auth/shopify/callback",
-  "https://related-ea-geneva-rev.trycloudflare.com/api/auth/callback",
-  "https://related-ea-geneva-rev.trycloudflare.com/.shopify/graphiql/auth/callback"
+  "https://garmin-before-they-back.trycloudflare.com/auth/callback",
+  "https://garmin-before-they-back.trycloudflare.com/auth/shopify/callback",
+  "https://garmin-before-they-back.trycloudflare.com/api/auth/callback",
+  "https://garmin-before-they-back.trycloudflare.com/.shopify/graphiql/auth/callback"
 ]
 
 [webhooks]

@@ -1,7 +1,8 @@
 import { useEffect, useState } from "react";
 
 export const useRandomTextGenerator = (numberOfCode = 5) => {
-	const [randomText,setRandomText] = useState(generateRandomText(numberOfCode.numberOfCodeDiscount));
+	console.log(numberOfCode)
+	const [randomText,setRandomText] = useState(generateRandomText(numberOfCode));
 
 	function generateRandomText(length){
 		const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
@@ -15,11 +16,11 @@ export const useRandomTextGenerator = (numberOfCode = 5) => {
 
 	useEffect(() => {
 		const updateRandomValues = () => {
-			const newRandomText = generateRandomText(numberOfCode.numberOfCodeDiscount);
+			const newRandomText = generateRandomText(numberOfCode);
 			setRandomText(newRandomText);
 		};
 		updateRandomValues();
-	}, [numberOfCode.numberOfCodeDiscount]);
+	}, [numberOfCode]);
 
 	return {randomText};
 

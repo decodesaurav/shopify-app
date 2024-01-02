@@ -120,6 +120,8 @@ export default function CreateDiscount() {
 				</div>
 				<DiscountCodePreview
 					numberOfCodeDiscount={numberOfCodeDiscount}
+					advancedPattern={textFieldValuePattern}
+					isAdvancedChecked={advancedCheckValue}
 				/>
 			</Layout.Section>
 			</Layout>
