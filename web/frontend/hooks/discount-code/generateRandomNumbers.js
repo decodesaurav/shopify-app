@@ -22,5 +22,4 @@ export const useRandomTextGenerator = (numberOfCode = 5) => {
 	}, [numberOfCode]);
 
 	return {randomText};
-
 }

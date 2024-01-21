@@ -5,17 +5,17 @@ import { Link,
 		List
 	} from '@shopify/polaris';
 
-const AdvancedSetting = () => {
+const AdvancedSetting = ({checkPriority}) => {
   const [advancedSetting, setAdvancedSetting] = useState(false);
-  const [selected, setSelected] = useState('today');
+  const [selected, setSelected] = useState('normal');
 
   const toggleAdvancedSetting = () => {
     setAdvancedSetting(!advancedSetting);
   };
-  const handleSelectChange = useCallback(
-    (value) => setSelected(value),
-    [],
-  );
+  const handleSelectChange = useCallback((value) => {
+		setSelected(value);
+		checkPriority(value);
+	},[checkPriority]);
 
   const options = [
     {label: 'Urgent', value: 'urgent'},

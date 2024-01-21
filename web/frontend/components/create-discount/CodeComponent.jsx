@@ -10,9 +10,9 @@ import useValidation from '../../hooks/discount-code/useValidation';
 import { useRandomTextGenerator } from '../../hooks/discount-code/generateRandomNumbers';
 
 
-export function CodeComponent({numberOfCodeDiscount, setNumberOfCodeDiscount}) {
+export function CodeComponent({numberOfCodeDiscount, setNumberOfCodeDiscount, onPrefixChange, onSuffixChange}) {
 	const {t} = useTranslation();
-	const { handleTextChange, validateTitle } = useValidation();
+	const { handleTextChange, validateTitle, validateError } = useValidation();
 	const [textFieldValuePrefix, setTextFieldValuePrefix] = useState('');
 	const [textFieldValueSuffix, setTextFieldValueSuffix] = useState('');
 	const [titleErrorPrefix, setTitleErrorPrefix] = useState('');
@@ -25,10 +25,11 @@ export function CodeComponent({numberOfCodeDiscount, setNumberOfCodeDiscount}) {
 		setNumberOfCodeDiscount(validValue);
 	}, []);
 
-	const handleFieldChange = useCallback((newValue, setFieldText, setTitleError) => {
+	const handleFieldChange = useCallback((newValue, setFieldText, setTitleError, onChange) => {
 		setFieldText(newValue);
 		handleTextChange(newValue);
 		validateTitle(newValue, setTitleError);
+		onChange(validateError(newValue));
 	  }, [handleTextChange, validateTitle]);
 
 
@@ -40,7 +41,7 @@ export function CodeComponent({numberOfCodeDiscount, setNumberOfCodeDiscount}) {
 					type="text"
 					placeholder='Example: GF (leave empty space for no prefix)'
 					value={textFieldValuePrefix}
-					onChange={(newValue) => handleFieldChange(newValue, setTextFieldValuePrefix, setTitleErrorPrefix)}
+					onChange={(newValue) => handleFieldChange(newValue, setTextFieldValuePrefix, setTitleErrorPrefix, onPrefixChange)}
 					helpText={`The discount code format will be: ${textFieldValuePrefix}-${randomText}-${textFieldValueSuffix}`}
 					autoComplete="email"
 				/>
@@ -61,7 +62,7 @@ export function CodeComponent({numberOfCodeDiscount, setNumberOfCodeDiscount}) {
 					type="text"
 					placeholder='Example: 15OFF (leave empty space for no prefix)'
 					value={textFieldValueSuffix}
-					onChange={(newValue) => handleFieldChange(newValue, setTextFieldValueSuffix, setTitleErrorSuffix)}
+					onChange={(newValue) => handleFieldChange(newValue, setTextFieldValueSuffix, setTitleErrorSuffix, onSuffixChange)}
 					helpText={`The discount code format will be: ${textFieldValuePrefix}-${randomText}-${textFieldValueSuffix}`}
 					/>
 					{ titleErrorSuffix && <div style={{ color: 'red' }}>{titleErrorSuffix}</div> }

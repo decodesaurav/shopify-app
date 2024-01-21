@@ -12,8 +12,26 @@ const useValidation = () => {
 
     const regex = /^[a-zA-Z0-9\s]*$/;
     const isValid = regex.test(value);
+	const isEmpty = value.trim() === '';
 
-    setTitleError(isValid ? '' : `Please use only letters, numbers, and spaces for the ${value}`);
+	if(isEmpty){
+    	setTitleError(isEmpty ? `This field cannot be empty.` : '');
+  	} else {
+    	setTitleError(isValid ? '' : `Please use only letters, numbers, and spaces for the ${value}`);
+	}
+  }, []);
+
+  const validateError = useCallback((value) => {
+
+    const regex = /^[a-zA-Z0-9\s]*$/;
+    const isValid = regex.test(value);
+	const isEmpty = value.trim() === '';
+
+	if(isEmpty || !isValid){
+    	return true;
+  	} else {
+		return false;
+	}
   }, []);
 
   return {
@@ -21,6 +39,7 @@ const useValidation = () => {
     titleError,
     handleTextChange,
     validateTitle,
+	validateError
   };
 };
 
