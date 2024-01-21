@@ -7,6 +7,7 @@ import {Layout,
 		Link
 } from '@shopify/polaris';
 import {React,useState, useCallback} from 'react';
+import { makeApiCall } from '../../hooks/apiUtils';
 import { useTranslation } from 'react-i18next';
 import {CodeComponent } from '../../components/create-discount/CodeComponent';
 import AdvancedSetting from '../../components/create-discount/AdvancedSetting';
@@ -17,13 +18,17 @@ import { SelectDiscount } from '../../components/create-discount/AutoComplete';
 
 export default function CreateDiscount() {
 	const {t} = useTranslation();
-	const [value, setValue] = useState('disabled');
-	const [numberOfCode, setNumberOfCode] = useState('100');
-	const [numberOfCodeDiscount, setNumberOfCodeDiscount] = useState('1');
-	const [textFieldValuePattern, setTextFieldValuePattern] = useState('[8LN]');
-	const [advancedCheckValue, setAdvancedValue] = useState([]);
+	const [value, setValue] = useState('random');
+	const [textErrorFromChild, setTextErrorFromChild] = useState(true);
+	const [textFieldValuePrefixParent, setTextFieldValuePrefix] = useState(true);
+  	const [textFieldValueSuffixParent, setTextFieldValueSuffix] = useState(true);
+	const [numberOfCode, setNumberOfCode] = useState(100);
+	const [numberOfCodeDiscount, setNumberOfCodeDiscount] = useState(1);
+	const [textFieldValuePattern, setTextFieldValuePattern] = useState('');
+	const [advancedCheckValue, setAdvancedValue] = useState('');
 	const [modalValue, setModalValueActive] = useState(false);
-	const [selectedOptionsFromSelect, setSelectedOptionsFromSelect] = useState([]);
+	const [priorityOfDiscountCode, setPriorityOfDiscountCode ] = useState('normal');
+	const [selectedOptionsFromSelect, setSelectedOptionsFromSelect] = useState(true);
 
 	const radioChange = useCallback((_, newValue) => setValue(newValue), []);
 	const handleDiscountCodeChange = useCallback((newValue) =>{
@@ -37,6 +42,41 @@ export default function CreateDiscount() {
 	const handleSelectionChange = (selectedOptions) => {
 		setSelectedOptionsFromSelect(selectedOptions);
 	};
+	const handlePrefixChange = (newValue) => {
+		setTextFieldValuePrefix(newValue);
+	};
+	
+	const handleSuffixChange = (newValue) => {
+		setTextFieldValueSuffix(newValue);
+	};
+
+	const setPriorityQueue = (newValue) => {
+		setPriorityOfDiscountCode(newValue);
+	}
+
+	const handleTextErrorChange = (error) => {
+		setTextErrorFromChild(error);
+	}
+
+	const handleGenerateDiscountCodes = async () => {
+		const {data, error} = await makeApiCall('/generate-discount-codes', 'post',{
+			value,
+			textFieldValuePrefixParent,
+			textFieldValueSuffixParent,
+			numberOfCode,
+			numberOfCodeDiscount,
+			textFieldValuePattern,
+			advancedCheckValue,
+			priorityOfDiscountCode,
+			textErrorFromChild,
+			selectedOptionsFromSelect
+		});
+		if (error){
+			console.log('Error: ' . error);
+		} else {
+			console.log(data);
+		}
+	};
 
 	return (
 		<Page
@@ -44,12 +84,16 @@ export default function CreateDiscount() {
 			title={t("CreateDiscount.discount_title")}
 			primaryAction={{
 				content : t("generate_discount_codes"),
+				onAction: handleGenerateDiscountCodes,
+				disabled: (textFieldValuePrefixParent || textFieldValueSuffixParent || textErrorFromChild || !selectedOptionsFromSelect || (advancedCheckValue.length > 0 &&  textFieldValuePattern.length === 0)  )
 			}}			
 		>
 		<Layout>
 			<Layout.Section>
 				<LegacyCard title="Discount details" sectioned>
-					<TitleComponent />
+					<TitleComponent
+						errorMessage = {handleTextErrorChange}
+					/>
 					<SelectDiscount onSelectionChange={handleSelectionChange} />
 					<div style={{ marginTop: '16px' }}>
 						<Link url="https://help.shopify.com/manual">Create New Discount</Link>
@@ -60,16 +104,16 @@ export default function CreateDiscount() {
 						<div style={{ display: 'flex', flexDirection: 'column' }}>
 							<RadioButton
 								label="Generate Random Codes"
-								checked={value === 'disabled'}
-								id="disabled"
+								checked={value === 'random'}
+								id="random"
 								name="random"
 								onChange={radioChange}
 							/>
 							<RadioButton
 								label="Import Existing Codes"
-								id="optional"
+								id="import"
 								name="import"
-								checked={value === 'optional'}
+								checked={value === 'import'}
 								onChange={radioChange}
 							/>
 						</div>
@@ -89,6 +133,8 @@ export default function CreateDiscount() {
 								<CodeComponent
 									numberOfCodeDiscount={numberOfCodeDiscount}
 									setNumberOfCodeDiscount={setNumberOfCodeDiscount}
+									onPrefixChange = {handlePrefixChange}
+									onSuffixChange = {handleSuffixChange}
 								/>
 								) : (
 									<AdvancedCodeComponent
@@ -102,7 +148,13 @@ export default function CreateDiscount() {
 						</Layout>
 						<div style={{ display: 'flex', flexDirection: 'column', marginTop: '16px' }}>
 							<OptionList
-								onChange={(selected) => handleAdvancedRadioChange(null,selected)}
+								onChange={(selected) =>{ 
+									handleAdvancedRadioChange(null,selected)
+									if (!selected.includes('advanced_pattern')) {
+										setTextFieldValuePrefix(true);
+										setTextFieldValueSuffix(true);
+									}
+								}}
 								options={[
 									{value: 'advanced_pattern', label: t("CreateDiscount.use_advanced_pattern")},
 								]}
@@ -116,7 +168,9 @@ export default function CreateDiscount() {
 				<LegacyCard sectioned>
 					<Layout>
 						<Layout.Section>
-							<AdvancedSetting />
+							<AdvancedSetting
+								checkPriority = {setPriorityQueue}
+							/>
 						</Layout.Section>
 					</Layout>
 				</LegacyCard>
