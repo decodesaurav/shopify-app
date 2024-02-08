@@ -2,6 +2,8 @@
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\API;
+use App\Http\Controllers\API\GenerateDiscountCodes;
 
 /*
 |--------------------------------------------------------------------------
@@ -14,6 +16,6 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::get('/', function () {
-    return "Hello API";
+Route::group(['middleware' => 'shopify.auth'], function(){
+	Route::post('/generate-discount-codes', [GenerateDiscountCodes::class, 'generateDiscountCode'] );
 });

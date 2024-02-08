@@ -7,7 +7,7 @@ import {Layout,
 		Link
 } from '@shopify/polaris';
 import {React,useState, useCallback} from 'react';
-import { makeApiCall } from '../../hooks/apiUtils';
+import { useApiCall } from '../../hooks/apiUtils';
 import { useTranslation } from 'react-i18next';
 import {CodeComponent } from '../../components/create-discount/CodeComponent';
 import AdvancedSetting from '../../components/create-discount/AdvancedSetting';
@@ -20,8 +20,8 @@ export default function CreateDiscount() {
 	const {t} = useTranslation();
 	const [value, setValue] = useState('random');
 	const [textErrorFromChild, setTextErrorFromChild] = useState(true);
-	const [textFieldValuePrefixParent, setTextFieldValuePrefix] = useState(true);
-  	const [textFieldValueSuffixParent, setTextFieldValueSuffix] = useState(true);
+	const [textFieldValuePrefixParent, setTextFieldValuePrefix] = useState('');
+  	const [textFieldValueSuffixParent, setTextFieldValueSuffix] = useState('');
 	const [numberOfCode, setNumberOfCode] = useState(100);
 	const [numberOfCodeDiscount, setNumberOfCodeDiscount] = useState(1);
 	const [textFieldValuePattern, setTextFieldValuePattern] = useState('');
@@ -43,6 +43,7 @@ export default function CreateDiscount() {
 		setSelectedOptionsFromSelect(selectedOptions);
 	};
 	const handlePrefixChange = (newValue) => {
+		console.log(newValue);
 		setTextFieldValuePrefix(newValue);
 	};
 	
@@ -57,9 +58,10 @@ export default function CreateDiscount() {
 	const handleTextErrorChange = (error) => {
 		setTextErrorFromChild(error);
 	}
+	const makeApiCall = useApiCall();
 
 	const handleGenerateDiscountCodes = async () => {
-		const {data, error} = await makeApiCall('/generate-discount-codes', 'post',{
+		const data = {
 			value,
 			textFieldValuePrefixParent,
 			textFieldValueSuffixParent,
@@ -70,11 +72,13 @@ export default function CreateDiscount() {
 			priorityOfDiscountCode,
 			textErrorFromChild,
 			selectedOptionsFromSelect
-		});
-		if (error){
-			console.log('Error: ' . error);
+		}
+		const { data: responseData, error } = await makeApiCall('/api/generate-discount-codes', 'post', data);
+
+		if (error) {
+			console.log('Error: ', error);
 		} else {
-			console.log(data);
+			console.log(responseData);
 		}
 	};
 
@@ -85,7 +89,7 @@ export default function CreateDiscount() {
 			primaryAction={{
 				content : t("generate_discount_codes"),
 				onAction: handleGenerateDiscountCodes,
-				disabled: (textFieldValuePrefixParent || textFieldValueSuffixParent || textErrorFromChild || !selectedOptionsFromSelect || (advancedCheckValue.length > 0 &&  textFieldValuePattern.length === 0)  )
+				disabled: (textFieldValuePrefixParent === true || textFieldValueSuffixParent === true ) || ( textErrorFromChild || !selectedOptionsFromSelect || (advancedCheckValue.length > 0 &&  textFieldValuePattern.length === 0)  )
 			}}			
 		>
 		<Layout>
