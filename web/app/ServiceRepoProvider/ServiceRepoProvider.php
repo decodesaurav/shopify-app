@@ -3,9 +3,11 @@
 namespace App\ServiceRepoProvider;
 
 use App\Repositories\DiscountRepository;
-use App\Contracts\DiscountServiceInterface;
+use App\Contracts\ShopifyGraphqlAPIServiceInterface;
 use App\Contracts\DiscountRepositoryInterface;
+use App\Contracts\ShopifyRestAPIServiceInterface;
 use App\Services\DiscountService;
+use App\Services\ShopifyRestAPIService;
 use Illuminate\Support\ServiceProvider;
 
 
@@ -28,6 +30,7 @@ class ServiceRepoProvider extends ServiceProvider {
 	  */
 	 public $bindings = [
 		DiscountRepositoryInterface::class => DiscountRepository::class,
-		DiscountServiceInterface::class=> DiscountService::class
+		ShopifyGraphqlAPIServiceInterface::class=> DiscountService::class,
+		ShopifyRestAPIServiceInterface::class=>ShopifyRestAPIService::class
 	 ];
 }

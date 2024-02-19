@@ -45,6 +45,7 @@ class DbSessionStorage implements SessionStorage
                 );
                 $session->setOnlineAccessInfo($onlineAccessInfo);
             }
+			$session->db_session = $dbSession;
             return $session;
         }
         return null;

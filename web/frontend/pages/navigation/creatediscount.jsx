@@ -20,8 +20,8 @@ export default function CreateDiscount() {
 	const {t} = useTranslation();
 	const [value, setValue] = useState('random');
 	const [textErrorFromChild, setTextErrorFromChild] = useState(true);
-	const [textFieldValuePrefixParent, setTextFieldValuePrefix] = useState('');
-  	const [textFieldValueSuffixParent, setTextFieldValueSuffix] = useState('');
+	const [textFieldValuePrefixParent, setTextFieldValuePrefix] = useState(true);
+  	const [textFieldValueSuffixParent, setTextFieldValueSuffix] = useState(true);
 	const [numberOfCode, setNumberOfCode] = useState(100);
 	const [numberOfCodeDiscount, setNumberOfCodeDiscount] = useState(1);
 	const [textFieldValuePattern, setTextFieldValuePattern] = useState('');
@@ -29,6 +29,8 @@ export default function CreateDiscount() {
 	const [modalValue, setModalValueActive] = useState(false);
 	const [priorityOfDiscountCode, setPriorityOfDiscountCode ] = useState('normal');
 	const [selectedOptionsFromSelect, setSelectedOptionsFromSelect] = useState(true);
+	const [selectedLabel, setSelectedLabel] = useState(1);
+
 
 	const radioChange = useCallback((_, newValue) => setValue(newValue), []);
 	const handleDiscountCodeChange = useCallback((newValue) =>{
@@ -42,6 +44,10 @@ export default function CreateDiscount() {
 	const handleSelectionChange = (selectedOptions) => {
 		setSelectedOptionsFromSelect(selectedOptions);
 	};
+
+	const handleLabelChange = (selectedLabel) => {
+		setSelectedLabel(selectedLabel);
+	}
 	const handlePrefixChange = (newValue) => {
 		console.log(newValue);
 		setTextFieldValuePrefix(newValue);
@@ -71,9 +77,11 @@ export default function CreateDiscount() {
 			advancedCheckValue,
 			priorityOfDiscountCode,
 			textErrorFromChild,
-			selectedOptionsFromSelect
+			selectedOptionsFromSelect,
+			selectedLabel
 		}
-		const { data: responseData, error } = await makeApiCall('/api/generate-discount-codes', 'post', data);
+		console.log(data);
+		const { data: responseData, error } = await makeApiCall('/api/generate-discount-codes', 'POST', data);
 
 		if (error) {
 			console.log('Error: ', error);
@@ -98,7 +106,10 @@ export default function CreateDiscount() {
 					<TitleComponent
 						errorMessage = {handleTextErrorChange}
 					/>
-					<SelectDiscount onSelectionChange={handleSelectionChange} />
+					<SelectDiscount
+						onSelectionChange={handleSelectionChange}
+						labelValue={handleLabelChange} 
+					/>
 					<div style={{ marginTop: '16px' }}>
 						<Link url="https://help.shopify.com/manual">Create New Discount</Link>
 					</div>
@@ -113,13 +124,13 @@ export default function CreateDiscount() {
 								name="random"
 								onChange={radioChange}
 							/>
-							<RadioButton
+							{/* <RadioButton
 								label="Import Existing Codes"
 								id="import"
 								name="import"
 								checked={value === 'import'}
 								onChange={radioChange}
-							/>
+							/> */}
 						</div>
 					</div>
 					<div>
@@ -169,7 +180,7 @@ export default function CreateDiscount() {
 					</div>
 				</LegacyCard>
 
-				<LegacyCard sectioned>
+				{/* <LegacyCard sectioned>
 					<Layout>
 						<Layout.Section>
 							<AdvancedSetting
@@ -177,7 +188,7 @@ export default function CreateDiscount() {
 							/>
 						</Layout.Section>
 					</Layout>
-				</LegacyCard>
+				</LegacyCard> */}
 
 				<div style={{marginBottom:'60px'}} ></div>
 			</Layout.Section>

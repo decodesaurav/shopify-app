@@ -15,6 +15,8 @@ use Shopify\Context;
 use Shopify\ApiVersion;
 use Shopify\Webhooks\Registry;
 use Shopify\Webhooks\Topics;
+use App\Services\GraphQLService;
+use GuzzleHttp\Client;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -29,6 +31,9 @@ class AppServiceProvider extends ServiceProvider
 			$this->app->register(TelescopeServiceProvider::class);
 			$this->app->register(ProvidersTelescopeServiceProvider::class);
 		}
+		$this->app->bind(GraphQLService::class, function ($app) {
+            return new GraphQLService(new Client());
+        });
     }
 
     /**
