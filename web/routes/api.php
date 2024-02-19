@@ -2,6 +2,9 @@
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\API;
+use App\Http\Controllers\API\Shopify\GraphQL\GenerateDiscountCodes;
+use App\Http\Controllers\API\Shopify\Rest\FetchDiscountForShop;
 
 /*
 |--------------------------------------------------------------------------
@@ -14,6 +17,9 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::get('/', function () {
-    return "Hello API";
+Route::group(['middleware' => 'shopify.auth'], function(){
+	Route::post('/generate-discount-codes', [GenerateDiscountCodes::class, 'generateDiscountCode'] );
+	Route::get('/get-all-discounts', [GenerateDiscountCodes::class, 'fetchDiscountsFromDB'] );
+	Route::get('/get-failed-discounts', [GenerateDiscountCodes::class, 'fetchFailedDiscountBatch'] );
+	Route::get('/get-discount-for-shop', [FetchDiscountForShop::class, 'fetchDiscountForShop']);
 });

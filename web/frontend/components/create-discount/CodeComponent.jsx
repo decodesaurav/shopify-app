@@ -29,22 +29,27 @@ export function CodeComponent({numberOfCodeDiscount, setNumberOfCodeDiscount, on
 		setFieldText(newValue);
 		handleTextChange(newValue);
 		validateTitle(newValue, setTitleError);
-		onChange(validateError(newValue));
-	  }, [handleTextChange, validateTitle]);
+		// Assuming onChange function updates validation error state
+		if(!validateError(newValue)){
+			onChange(newValue)
+		} else {
+			onChange(validateError(newValue));
+		}
+	}, [handleTextChange, validateTitle, validateError]);
 
 
 	return(
 		<>
 			<Layout.Section>
-				<TextField
-					label="Prefix"
-					type="text"
-					placeholder='Example: GF (leave empty space for no prefix)'
-					value={textFieldValuePrefix}
-					onChange={(newValue) => handleFieldChange(newValue, setTextFieldValuePrefix, setTitleErrorPrefix, onPrefixChange)}
-					helpText={`The discount code format will be: ${textFieldValuePrefix}-${randomText}-${textFieldValueSuffix}`}
-					autoComplete="email"
-				/>
+			<TextField
+				label="Prefix"
+				type="text"
+				placeholder='Example: GF (leave empty space for no prefix)'
+				value={textFieldValuePrefix}
+				onChange={(newValue) => handleFieldChange(newValue, setTextFieldValuePrefix, setTitleErrorPrefix, onPrefixChange)}
+				helpText={`The discount code format will be: ${textFieldValuePrefix}-${randomText}-${textFieldValueSuffix}`}
+				autoComplete="email"
+			/>
 				{ titleErrorPrefix && <div style={{ color: 'red' }}>{titleErrorPrefix}</div> }
 			</Layout.Section>
 			<Layout.Section>
@@ -57,14 +62,14 @@ export function CodeComponent({numberOfCodeDiscount, setNumberOfCodeDiscount, on
 				/>
 			</Layout.Section>
 			<Layout.Section>
-				<TextField
-					label="Suffix"
-					type="text"
-					placeholder='Example: 15OFF (leave empty space for no prefix)'
-					value={textFieldValueSuffix}
-					onChange={(newValue) => handleFieldChange(newValue, setTextFieldValueSuffix, setTitleErrorSuffix, onSuffixChange)}
-					helpText={`The discount code format will be: ${textFieldValuePrefix}-${randomText}-${textFieldValueSuffix}`}
-					/>
+			<TextField
+				label="Suffix"
+				type="text"
+				placeholder='Example: 15OFF (leave empty space for no prefix)'
+				value={textFieldValueSuffix}
+				onChange={(newValue) => handleFieldChange(newValue, setTextFieldValueSuffix, setTitleErrorSuffix, onSuffixChange)}
+				helpText={`The discount code format will be: ${textFieldValuePrefix}-${randomText}-${textFieldValueSuffix}`}
+			/>
 					{ titleErrorSuffix && <div style={{ color: 'red' }}>{titleErrorSuffix}</div> }
 			</Layout.Section>
 		</>

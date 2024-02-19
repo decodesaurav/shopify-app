@@ -7,7 +7,7 @@ import {Layout,
 		Link
 } from '@shopify/polaris';
 import {React,useState, useCallback} from 'react';
-import { makeApiCall } from '../../hooks/apiUtils';
+import { useApiCall } from '../../hooks/apiUtils';
 import { useTranslation } from 'react-i18next';
 import {CodeComponent } from '../../components/create-discount/CodeComponent';
 import AdvancedSetting from '../../components/create-discount/AdvancedSetting';
@@ -29,6 +29,8 @@ export default function CreateDiscount() {
 	const [modalValue, setModalValueActive] = useState(false);
 	const [priorityOfDiscountCode, setPriorityOfDiscountCode ] = useState('normal');
 	const [selectedOptionsFromSelect, setSelectedOptionsFromSelect] = useState(true);
+	const [selectedLabel, setSelectedLabel] = useState(1);
+
 
 	const radioChange = useCallback((_, newValue) => setValue(newValue), []);
 	const handleDiscountCodeChange = useCallback((newValue) =>{
@@ -42,7 +44,12 @@ export default function CreateDiscount() {
 	const handleSelectionChange = (selectedOptions) => {
 		setSelectedOptionsFromSelect(selectedOptions);
 	};
+
+	const handleLabelChange = (selectedLabel) => {
+		setSelectedLabel(selectedLabel);
+	}
 	const handlePrefixChange = (newValue) => {
+		console.log(newValue);
 		setTextFieldValuePrefix(newValue);
 	};
 	
@@ -57,9 +64,10 @@ export default function CreateDiscount() {
 	const handleTextErrorChange = (error) => {
 		setTextErrorFromChild(error);
 	}
+	const makeApiCall = useApiCall();
 
 	const handleGenerateDiscountCodes = async () => {
-		const {data, error} = await makeApiCall('/generate-discount-codes', 'post',{
+		const data = {
 			value,
 			textFieldValuePrefixParent,
 			textFieldValueSuffixParent,
@@ -69,12 +77,16 @@ export default function CreateDiscount() {
 			advancedCheckValue,
 			priorityOfDiscountCode,
 			textErrorFromChild,
-			selectedOptionsFromSelect
-		});
-		if (error){
-			console.log('Error: ' . error);
+			selectedOptionsFromSelect,
+			selectedLabel
+		}
+		console.log(data);
+		const { data: responseData, error } = await makeApiCall('/api/generate-discount-codes', 'POST', data);
+
+		if (error) {
+			console.log('Error: ', error);
 		} else {
-			console.log(data);
+			console.log(responseData);
 		}
 	};
 
@@ -85,7 +97,7 @@ export default function CreateDiscount() {
 			primaryAction={{
 				content : t("generate_discount_codes"),
 				onAction: handleGenerateDiscountCodes,
-				disabled: (textFieldValuePrefixParent || textFieldValueSuffixParent || textErrorFromChild || !selectedOptionsFromSelect || (advancedCheckValue.length > 0 &&  textFieldValuePattern.length === 0)  )
+				disabled: (textFieldValuePrefixParent === true || textFieldValueSuffixParent === true ) || ( textErrorFromChild || !selectedOptionsFromSelect || (advancedCheckValue.length > 0 &&  textFieldValuePattern.length === 0)  )
 			}}			
 		>
 		<Layout>
@@ -94,7 +106,10 @@ export default function CreateDiscount() {
 					<TitleComponent
 						errorMessage = {handleTextErrorChange}
 					/>
-					<SelectDiscount onSelectionChange={handleSelectionChange} />
+					<SelectDiscount
+						onSelectionChange={handleSelectionChange}
+						labelValue={handleLabelChange} 
+					/>
 					<div style={{ marginTop: '16px' }}>
 						<Link url="https://help.shopify.com/manual">Create New Discount</Link>
 					</div>
@@ -109,13 +124,13 @@ export default function CreateDiscount() {
 								name="random"
 								onChange={radioChange}
 							/>
-							<RadioButton
+							{/* <RadioButton
 								label="Import Existing Codes"
 								id="import"
 								name="import"
 								checked={value === 'import'}
 								onChange={radioChange}
-							/>
+							/> */}
 						</div>
 					</div>
 					<div>
@@ -165,7 +180,7 @@ export default function CreateDiscount() {
 					</div>
 				</LegacyCard>
 
-				<LegacyCard sectioned>
+				{/* <LegacyCard sectioned>
 					<Layout>
 						<Layout.Section>
 							<AdvancedSetting
@@ -173,7 +188,7 @@ export default function CreateDiscount() {
 							/>
 						</Layout.Section>
 					</Layout>
-				</LegacyCard>
+				</LegacyCard> */}
 
 				<div style={{marginBottom:'60px'}} ></div>
 			</Layout.Section>

@@ -1,15 +1,28 @@
-import axios from 'axios';
+// useApiCall.js
+import { useAuthenticatedFetch } from '../hooks/index.js';
 
-export const makeApiCall = async (url, method = 'get', data = null) => {
-  try {
-    const response = await axios({
-      method,
-      url,
-      data,
-    });
+export const useApiCall = () => {
+  const fetch = useAuthenticatedFetch();
 
-    return { data: response.data, error: null };
-  } catch (error) {
-    return { data: null, error };
-  }
+  const makeApiCall = async (url, method = 'get', data = null) => {
+    try {
+      console.log(data, url, method);
+
+      const response = await fetch(url, {
+		method: method,
+		headers: {
+		  'Accept': 'application/json',
+		  'Content-Type': 'application/json'
+		},
+		...(method === 'POST' ? { body: JSON.stringify(data) } : {})
+	  });
+	  const responseData = await response.json();
+
+      return { data: responseData.data, count: responseData.count, error: null };
+    } catch (error) {
+      return { data: null, count:null, error };
+    }
+  };
+
+  return makeApiCall;
 };
