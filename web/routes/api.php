@@ -5,6 +5,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\API;
 use App\Http\Controllers\API\Shopify\GraphQL\GenerateDiscountCodes;
 use App\Http\Controllers\API\Shopify\Rest\FetchDiscountForShop;
+use App\Http\Controllers\API\Shopify\GraphQL\BillingController;
 
 /*
 |--------------------------------------------------------------------------
@@ -22,4 +23,7 @@ Route::group(['middleware' => 'shopify.auth'], function(){
 	Route::get('/get-all-discounts', [GenerateDiscountCodes::class, 'fetchDiscountsFromDB'] );
 	Route::get('/get-failed-discounts', [GenerateDiscountCodes::class, 'fetchFailedDiscountBatch'] );
 	Route::get('/get-discount-for-shop', [FetchDiscountForShop::class, 'fetchDiscountForShop']);
+	Route::get('/search-discounts', [FetchDiscountForShop::class, 'fetchDiscountRulesFromDB']);
+	Route::get('/get-dashboard-data', [FetchDiscountForShop::class, 'fetchDashboardData']);
+	//Route::get('/check-pricing-status', [BillingController::class, 'hasPayment'])->name('check-pricing');
 });

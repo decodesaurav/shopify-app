@@ -31,7 +31,14 @@ class DataPreparationService{
 			$generatedCodes = [];
 			for ($i = 1 ; $i<=$numberOfCodeToGenerate ; $i++){
 				$randomString = $this->generateRandomString($randomNumberOrLetter);
-				$generatedCode = $codePrefix . '-' . $randomString . '-' . $codeSuffix;
+				$generatedCode = '';
+				if ($codePrefix) {
+					$generatedCode .= $codePrefix . '-';
+				}
+				$generatedCode .= $randomString;
+				if ($codeSuffix) {
+					$generatedCode .= '-' . $codeSuffix;
+				}
 				$generatedCodes[] = ['code' => $generatedCode];
 			}
 			return $generatedCodes;
@@ -52,4 +59,17 @@ class DataPreparationService{
 		$sortString = $sortStringArray[1];
 		return $sortString;
 	}
+
+	public function prepareDataForUI($discountBody, $shopifyData){
+		$priceRuleWithDiscountTitle = array_map(function($item) use ($shopifyData) {
+			return [
+				'discount_rule_id' => $item['id'],
+				'discount_name' => $item['title'],
+				'shopify_session_id' => $shopifyData['id'],
+			];
+		}, $discountBody['price_rules']);
+	
+		return $priceRuleWithDiscountTitle;
+	}
+
 }

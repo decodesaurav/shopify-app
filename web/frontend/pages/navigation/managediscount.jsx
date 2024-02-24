@@ -9,7 +9,8 @@ import {
 	useBreakpoints,
 	Page,
 	Pagination,
-	Layout
+	Layout,
+	SkeletonBodyText
   } from '@shopify/polaris';
 import {useState, useCallback, useEffect} from 'react';
 import _debounce from 'lodash/debounce';
@@ -17,7 +18,7 @@ import { useApiCall } from '../../hooks/apiUtils';
 
   
 export default function IndexTableWithViewsSearchFilterSorting() {
-	const [loading, setLoading] = useState(false);
+	const [loading, setLoading] = useState(true);
 	const [totalCount, setTotalCount] = useState(0);
 	const [itemStrings, setItemStrings] = useState([
 	  'All',
@@ -74,8 +75,6 @@ export default function IndexTableWithViewsSearchFilterSorting() {
 	const debounceFetchData = _debounce(
 		async (value, page) => {
 		  try {
-			setLoading(true);
-			console.log(page);
 			const endpoint =
 			  selected === 0
 				? `/api/get-all-discounts?search=${value}&sort=${sortSelected}&page=${page}`
@@ -96,7 +95,6 @@ export default function IndexTableWithViewsSearchFilterSorting() {
 
 	const fetchData = async (page) => {
 		try {
-		setLoading(true);
 		const endpoint =
 			selected === 0
 			? `/api/get-all-discounts?sort=${sortSelected}&page=${page}`
@@ -165,64 +163,74 @@ export default function IndexTableWithViewsSearchFilterSorting() {
 	);
   
 	return (
-	<Page>
-		<Layout.Section>
+		<>
+		{!loading ? (
+		<Page title="Discount Batches">
+			<Layout.Section>
 			<LegacyCard>
 				<IndexFilters
-					sortOptions={sortOptions}
-					sortSelected={sortSelected}
-					queryValue={queryValue}
-					queryPlaceholder="Searching in Shopify Discount"
-					onQueryChange={handleFiltersQueryChange}
-					onSortChange={handleSortChange}
-					onQueryClear={handleQueryCancel}
-					onSort={setSortSelected}
-					cancelAction={{
-						onAction: onHandleCancel,
-						disabled: false,
-						loading: false,
-					}}
-					tabs={tabs}
-					selected={selected}
-					onSelect={setSelected}
-					canCreateNewView={false}
-					filters={filters}
-					appliedFilters={appliedFilters}
-					mode={mode}
-					setMode={setMode}
+				sortOptions={sortOptions}
+				sortSelected={sortSelected}
+				queryValue={queryValue}
+				queryPlaceholder="Searching in Shopify Discount"
+				onQueryChange={handleFiltersQueryChange}
+				onSortChange={handleSortChange}
+				onQueryClear={handleQueryCancel}
+				onSort={setSortSelected}
+				cancelAction={{
+					onAction: onHandleCancel,
+					disabled: false,
+					loading: false,
+				}}
+				tabs={tabs}
+				selected={selected}
+				onSelect={setSelected}
+				canCreateNewView={false}
+				filters={filters}
+				appliedFilters={appliedFilters}
+				mode={mode}
+				setMode={setMode}
 				/>
 				<IndexTable
-					condensed={useBreakpoints().smDown}
-					resourceName={resourceName}
-					itemCount={orders.length}
-					headings={[
-						{title: 'Discount Batch'},
-						{title: 'Number of Discount'},
-						{title: 'Shopify Discount'},
-						{title: 'Code Prefix'},
-						{title: 'Code Suffix'},
-						{title: 'Remarks'},
-					]}
-					selectable={false}
+				resourceName={resourceName}
+				itemCount={orders.length}
+				headings={[
+					{ title: 'Discount Batch' },
+					{ title: 'Number of Discount' },
+					{ title: 'Shopify Discount' },
+					{ title: 'Code Prefix' },
+					{ title: 'Code Suffix' },
+					{ title: 'Remarks' },
+				]}
+				selectable={false}
 				>
-					{loading ? (
-						<IndexTable.Row>
-							<IndexTable.Cell>
-								<Spinner accessibilityLabel="Loading" size="large" />
-							</IndexTable.Cell>
-						</IndexTable.Row>
-					) :
-					rowMarkup}
+				{loading ? (
+					<IndexTable.Row>
+					<IndexTable.Cell>
+						<Spinner accessibilityLabel="Loading" size="large" />
+					</IndexTable.Cell>
+					</IndexTable.Row>
+				) :
+					rowMarkup
+				}
 				</IndexTable>
-				<Pagination
-					hasPrevious= {currentPage > 1}
-					onPrevious={handlePreviousPage}
-					hasNext = {(currentPage * 15 < totalCount)}
-					onNext={handleNextPage}
-					label={`${(currentPage - 1) * 15 + 1}-${currentPage * 15} of ${totalCount} Batches`}
-				/>
 			</LegacyCard>
-		</Layout.Section>	
-	</Page>  
-	);
-  }
+			<div style={{ display: 'flex', margin: '10px', justifyContent: 'end' }}>
+				<Pagination
+				hasPrevious={currentPage > 1}
+				onPrevious={handlePreviousPage}
+				hasNext={currentPage * 15 < totalCount}
+				onNext={handleNextPage}
+				label={`${(currentPage - 1) * 15 + 1}-${currentPage * 15} of ${totalCount} Batches`}
+				/>
+			</div>
+			</Layout.Section>
+		</Page>
+		) : (
+		<SkeletonBodyText>
+			{/* Your skeleton or loading state content */}
+		</SkeletonBodyText>
+		)}
+	</>
+);
+};
