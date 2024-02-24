@@ -2,31 +2,43 @@ import { Autocomplete, Icon } from '@shopify/polaris';
 import { SearchMinor } from '@shopify/polaris-icons';
 import { useState, useCallback, useEffect } from 'react';
 import { useApiCall } from '../../hooks/apiUtils';
+import _debounce from 'lodash/debounce';
 
 export function SelectDiscount({ onSelectionChange, labelValue }) {
   const [selectedOptions, setSelectedOptions] = useState([]);
   const [inputValue, setInputValue] = useState([]);
   const [options, setOptions] = useState([]);
 
-  const makeApiCall = useApiCall();
+const makeApiCall = useApiCall();
 
-  const updateText = useCallback(
-    (value) => {
-      setInputValue(value);
+const handleDiscountSearchChange = useCallback(
+	_debounce((value) => {
+		setInputValue(value);
+		debouncedUpdateText(value);
+	}, 100),
+	[]
+);
 
-      if (value === '') {
-        setOptions(selectedOptions);
-        return;
-      }
-
-      const filterRegex = new RegExp(value, 'i');
-      const resultOptions = selectedOptions.filter((option) =>
-        option.label.match(filterRegex),
-      );
-      setOptions(resultOptions);
-    },
-    [selectedOptions],
-  );
+const debouncedUpdateText =  _debounce(
+  async (value) => {
+    try {
+		const endpoint = `/api/search-discounts?query=${value}`;
+		const { data, count, error } = await makeApiCall(endpoint, 'get');
+		if (data) {
+			const resultOptions = data.map((option) => ({
+				value: option.id,
+				label: option.discount_name,
+			}));
+			setOptions(resultOptions);
+		} else {
+			console.error('Error fetching data:', error);
+		}
+    } catch (error) {
+      console.error('Error fetching data:', error);
+    }
+  },
+  600
+);
 
   const updateSelection = useCallback(
     (selected) => {
@@ -57,7 +69,7 @@ export function SelectDiscount({ onSelectionChange, labelValue }) {
 
   const textField = (
     <Autocomplete.TextField
-      onChange={updateText}
+      onChange={handleDiscountSearchChange}
       label="Discount"
       value={inputValue}
       prefix={<Icon source={SearchMinor} tone="base" />}
@@ -73,9 +85,8 @@ export function SelectDiscount({ onSelectionChange, labelValue }) {
         if (error) {
           console.log('Error: ', error);
         } else {
-          // Assuming data is an array of objects with 'value' and 'label' properties
           const formattedOptions = data.map((item) => ({
-            value: item.id,
+            value: item.discount_rule_id,
             label: item.discount_name,
           }));
 

@@ -33,8 +33,12 @@ export default function App() {
 				{
 					label: t("NavigationMenu.manage_discount"),
 					destination: "/navigation/managediscount",
+				},
+				{
+					label: t("NavigationMenu.faq"),
+					destination: "/navigation/faq",
 				}
-              ]}
+            ]}
             />
             <Routes pages={pages} />
           </QueryProvider>

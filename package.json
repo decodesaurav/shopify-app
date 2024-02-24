@@ -15,6 +15,7 @@
     "@shopify/app": "^3.55.4",
     "@shopify/cli": "^3.55.4",
     "@shopify/polaris": "^12.16.0",
+    "@shopify/polaris-icons": "^8.3.0",
     "axios": "^1.6.5",
     "lodash": "^4.17.21"
   },

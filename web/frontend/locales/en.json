@@ -11,7 +11,8 @@
     "pageName": "Page name",
 	"createDiscount": "Create Codes",
 	"dashboard": "Dashboard",
-	"manage_discount": "Manage Codes"
+	"manage_discount": "Manage Codes",
+	"faq":"FAQ"
   },
   "CreateDiscount" : {
 	"discount_title": "Create Discount Codes Batch",

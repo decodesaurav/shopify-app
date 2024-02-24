@@ -20,15 +20,15 @@ export default function CreateDiscount() {
 	const {t} = useTranslation();
 	const [value, setValue] = useState('random');
 	const [textErrorFromChild, setTextErrorFromChild] = useState(true);
-	const [textFieldValuePrefixParent, setTextFieldValuePrefix] = useState(true);
-  	const [textFieldValueSuffixParent, setTextFieldValueSuffix] = useState(true);
+	const [textFieldValuePrefixParent, setTextFieldValuePrefix] = useState(false);
+  	const [textFieldValueSuffixParent, setTextFieldValueSuffix] = useState(false);
 	const [numberOfCode, setNumberOfCode] = useState(100);
 	const [numberOfCodeDiscount, setNumberOfCodeDiscount] = useState(1);
 	const [textFieldValuePattern, setTextFieldValuePattern] = useState('');
 	const [advancedCheckValue, setAdvancedValue] = useState('');
 	const [modalValue, setModalValueActive] = useState(false);
 	const [priorityOfDiscountCode, setPriorityOfDiscountCode ] = useState('normal');
-	const [selectedOptionsFromSelect, setSelectedOptionsFromSelect] = useState(true);
+	const [selectedOptionsFromSelect, setSelectedOptionsFromSelect] = useState('');
 	const [selectedLabel, setSelectedLabel] = useState(1);
 
 
@@ -80,7 +80,6 @@ export default function CreateDiscount() {
 			selectedOptionsFromSelect,
 			selectedLabel
 		}
-		console.log(data);
 		const { data: responseData, error } = await makeApiCall('/api/generate-discount-codes', 'POST', data);
 
 		if (error) {
@@ -97,7 +96,7 @@ export default function CreateDiscount() {
 			primaryAction={{
 				content : t("generate_discount_codes"),
 				onAction: handleGenerateDiscountCodes,
-				disabled: (textFieldValuePrefixParent === true || textFieldValueSuffixParent === true ) || ( textErrorFromChild || !selectedOptionsFromSelect || (advancedCheckValue.length > 0 &&  textFieldValuePattern.length === 0)  )
+				disabled: ( textErrorFromChild || (selectedOptionsFromSelect=='') || (advancedCheckValue.length > 0 &&  textFieldValuePattern.length === 0)  )
 			}}			
 		>
 		<Layout>
