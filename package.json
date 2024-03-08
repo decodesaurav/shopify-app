@@ -12,12 +12,14 @@
     "info": "shopify app info"
   },
   "dependencies": {
-    "@shopify/app": "^3.55.4",
-    "@shopify/cli": "^3.55.4",
-    "@shopify/polaris": "^12.16.0",
+    "@shopify/app": "^3.57.0",
+    "@shopify/cli": "^3.57.0",
+    "@shopify/polaris": "^12.18.0",
     "@shopify/polaris-icons": "^8.3.0",
     "axios": "^1.6.5",
-    "lodash": "^4.17.21"
+    "lodash": "^4.17.21",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0"
   },
   "author": "decodesaurav",
   "private": true,

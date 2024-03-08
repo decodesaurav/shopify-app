@@ -15,7 +15,7 @@ return [
     |
     */
 
-    'domain' => env('HORIZON_DOMAIN'),
+    'domain' => env('HOST', "http://localhost:8001"),
 
     /*
     |--------------------------------------------------------------------------
@@ -28,7 +28,7 @@ return [
     |
     */
 
-    'path' => env('HORIZON_PATH', 'horizon'),
+    'path' => env('HORIZON_PATH', 'api/horizon'),
 
     /*
     |--------------------------------------------------------------------------
@@ -189,7 +189,7 @@ return [
             'maxTime' => 0,
             'maxJobs' => 0,
             'memory' => 128,
-            'tries' => 1,
+            'tries' => 3,
             'timeout' => 60,
             'nice' => 0,
         ],

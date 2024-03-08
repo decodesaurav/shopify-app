@@ -1,5 +1,6 @@
 import { Autocomplete, Icon } from '@shopify/polaris';
 import { SearchMinor } from '@shopify/polaris-icons';
+import {useNavigate} from 'react-router-dom';
 import { useState, useCallback, useEffect } from 'react';
 import { useApiCall } from '../../hooks/apiUtils';
 import _debounce from 'lodash/debounce';
@@ -10,6 +11,7 @@ export function SelectDiscount({ onSelectionChange, labelValue }) {
   const [options, setOptions] = useState([]);
 
 const makeApiCall = useApiCall();
+const navigate = useNavigate();
 
 const handleDiscountSearchChange = useCallback(
 	_debounce((value) => {
@@ -81,7 +83,11 @@ const debouncedUpdateText =  _debounce(
   useEffect(() => {
     const fetchDiscountOptions = async () => {
       try {
-        const { data, error } = await makeApiCall('/api/get-discount-for-shop', 'get');
+        const { data, error, redirectToPricing } = await makeApiCall('/api/get-discount-for-shop', 'get');
+		
+		if(redirectToPricing){
+			return navigate('/pricing-plan');
+		}
         if (error) {
           console.log('Error: ', error);
         } else {

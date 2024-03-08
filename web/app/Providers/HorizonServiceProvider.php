@@ -14,6 +14,9 @@ class HorizonServiceProvider extends HorizonApplicationServiceProvider
     public function boot(): void
     {
         parent::boot();
+		Horizon::auth(function ($request) {
+            return true;
+        });
 
         // Horizon::routeSmsNotificationsTo('15556667777');
         // Horizon::routeMailNotificationsTo('example@example.com');
@@ -28,9 +31,7 @@ class HorizonServiceProvider extends HorizonApplicationServiceProvider
     protected function gate(): void
     {
         Gate::define('viewHorizon', function ($user) {
-            return in_array($user->email, [
-                //
-            ]);
+            return true;
         });
     }
 }

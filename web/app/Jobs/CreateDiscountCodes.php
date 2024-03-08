@@ -2,23 +2,41 @@
 
 namespace App\Jobs;
 
+use Illuminate\Bus\Batchable;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldBeUnique;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
-use App\Services\DiscountService;
-use App\Services\GraphQLService;
+use Illuminate\Support\Facades\Log;
+use Shopify\Clients\Graphql;
 
 class CreateDiscountCodes implements ShouldQueue
 {
-    use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
+    use Batchable, Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 	protected $codes;
 	protected $discountId;
 	protected $shopifySession;
 	protected $graphQlQuery;
 	protected $variables;
+
+	public const CREATE_DISCOUNT_CODE_MUTATION =
+	<<<'GRAPHQL'
+	mutation discountRedeemCodeBulkAdd($discountId: ID!, $codes: [DiscountRedeemCodeInput!]!) {
+		discountRedeemCodeBulkAdd(discountId: $discountId, codes: $codes) {
+			bulkCreation {
+				id
+			}
+			userErrors {
+				code
+				field
+				message
+			}
+		}
+		}
+	GRAPHQL;
+
     /**
      * Create a new job instance.
      *
@@ -38,27 +56,27 @@ class CreateDiscountCodes implements ShouldQueue
      */
     public function handle()
     {
-		$graphQlService = new GraphQLService();
-		$graphQLQueryForDiscountPost ='
-			<<<QUERY
-				mutation discountRedeemCodeBulkAdd($discountId: ID!, $codes: [DiscountRedeemCodeInput!]!) {
-					discountRedeemCodeBulkAdd(discountId: $discountId, codes: $codes) {
-						bulkCreation {
-							id
-						}
-						userErrors {
-							code
-							field
-							message
-						}
-					}
-				}
-			QUERY
-		';
-		$variables = [
-			"discountId" => $this->discountId,
-			"codes" => $this->codes,
-		];
-        $makeRandomDiscountCode = $graphQlService->sendQuery($graphQLQueryForDiscountPost, $variables, $this->shopifySession );
+		try{
+			$client = new Graphql($this->shopifySession->shop, $this->shopifySession->access_token);
+			$response = $client->query(
+                [
+                    "query" =>self::CREATE_DISCOUNT_CODE_MUTATION,
+					"variables" => [
+						"discountId" => "gid://shopify/DiscountCodeNode/$this->discountId",
+						"codes" => $this->codes
+					]
+                ],
+            );
+			if ($response->getStatusCode() !== 200) {
+				Log::channel('daily')->error('Failed to create discount codes for ' . $this->shopifySession->shop );
+			} else {
+				return response()
+				Log::channel("daily")->info("Data :" . json_encode($response->getBody()));
+			}
+		} catch (\Exception $e){
+			$this->fail($e);
+			Log::channel("daily")->info("Data :" . $e->getMessage());
+			$this->release(7200);
+		}
     }
 }

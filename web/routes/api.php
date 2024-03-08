@@ -25,5 +25,6 @@ Route::group(['middleware' => 'shopify.auth'], function(){
 	Route::get('/get-discount-for-shop', [FetchDiscountForShop::class, 'fetchDiscountForShop']);
 	Route::get('/search-discounts', [FetchDiscountForShop::class, 'fetchDiscountRulesFromDB']);
 	Route::get('/get-dashboard-data', [FetchDiscountForShop::class, 'fetchDashboardData']);
-	//Route::get('/check-pricing-status', [BillingController::class, 'hasPayment'])->name('check-pricing');
+	Route::get('/check-pricing-status', [BillingController::class, 'hasPayment'])->name('check-pricing');
+	Route::post('/accept-pricing-plan', [BillingController::class, 'requestPayment'])->name('confirm-pricing');
 });

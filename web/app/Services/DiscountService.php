@@ -29,7 +29,8 @@ class DiscountService implements ShopifyGraphqlAPIServiceInterface {
 			$discountId = $checkSaveSuccessfulToDB['data']['price_rule'];
 			$chunkedCode = array_chunk($makeRandomDiscountCode, 25);
 			foreach ($chunkedCode as $codes){
-				$discountPostJob = CreateDiscountCodes::dispatch($codes, $discountId, $shopifySession );
+				$response = CreateDiscountCodes::dispatch($codes, $discountId, $shopifySession );
+				logger("Response" . json_encode($response));
 			}
 		} else {
 			response()->json([

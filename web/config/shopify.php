@@ -17,14 +17,29 @@ return [
     | Learn more about billing in our documentation: https://shopify.dev/docs/apps/billing
     |
     */
-    "billing" => [
-        "required" => false,
-
-        // Example set of values to create a charge for $5 one time
-        "chargeName" => "My Shopify App One-Time Billing",
-        "amount" => 5.0,
-        "currencyCode" => "USD", // Currently only supports USD
-        "interval" => EnsureBilling::INTERVAL_ONE_TIME,
+	"billing" => [
+        "required" => true,
+        "interval" => EnsureBilling::INTERVAL_EVERY_30_DAYS,
+        "chargeName" => "Early Bird Plan",
+        'early_adopter_recurring_charge_1_99' => [
+            "chargeName" => "Early Adopter Recurring Charge",
+            "slug" => "early_adopter_recurring_charge_1_99",
+            "amount" => 1.99,
+            "currencyCode" => "USD", // Currently only supports USD
+            "interval" => EnsureBilling::INTERVAL_EVERY_30_DAYS,
+        ],
     ],
-
+	"free_plan" => [
+        "required" => false,
+        "interval" => EnsureBilling::INTERVAL_EVERY_30_DAYS,
+        "chargeName" => "Release Plan",
+        'free_plan' => [
+            "chargeName" => "Release Plan",
+            "slug" => "free_plan",
+            "amount" => 1.99,
+            "currencyCode" => "USD", // Currently only supports USD
+            "interval" => EnsureBilling::INTERVAL_EVERY_30_DAYS,
+		],
+	],
 ];
+
