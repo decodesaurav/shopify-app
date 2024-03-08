@@ -15,6 +15,7 @@ import AdvancedCodeComponent from '../../components/create-discount/AdvancedCode
 import TitleComponent from '../../components/create-discount/DiscountDetails';
 import SummaryComponent from '../../components/create-discount/SummaryComponent';
 import { SelectDiscount } from '../../components/create-discount/AutoComplete';
+import {useNavigate} from 'react-router-dom';
 
 export default function CreateDiscount() {
 	const {t} = useTranslation();
@@ -30,6 +31,7 @@ export default function CreateDiscount() {
 	const [priorityOfDiscountCode, setPriorityOfDiscountCode ] = useState('normal');
 	const [selectedOptionsFromSelect, setSelectedOptionsFromSelect] = useState('');
 	const [selectedLabel, setSelectedLabel] = useState(1);
+	const navigate = useNavigate();
 
 
 	const radioChange = useCallback((_, newValue) => setValue(newValue), []);
@@ -80,7 +82,11 @@ export default function CreateDiscount() {
 			selectedOptionsFromSelect,
 			selectedLabel
 		}
-		const { data: responseData, error } = await makeApiCall('/api/generate-discount-codes', 'POST', data);
+		const { data: responseData, error, redirectToPricing } = await makeApiCall('/api/generate-discount-codes', 'POST', data);
+
+		if(redirectToPricing){
+			return navigate('/pricing-plan');
+		}
 
 		if (error) {
 			console.log('Error: ', error);

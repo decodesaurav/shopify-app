@@ -34,18 +34,15 @@ class EnsureBilling
      * - hasPayment: bool
      * - confirmationUrl: string|null
      */
-    public static function check(Session $session, array $config): array
+    public static function check(Session $session, array $config): bool
     {
-        $confirmationUrl = null;
-
         if (self::hasActivePayment($session, $config)) {
             $hasPayment = true;
         } else {
             $hasPayment = false;
-            $confirmationUrl = self::requestPayment($session, $config);
         }
 
-        return [$hasPayment, $confirmationUrl];
+        return $hasPayment;
     }
 
     private static function hasActivePayment(Session $session, array $config): bool
@@ -108,7 +105,7 @@ class EnsureBilling
     /**
      * @return string|null
      */
-    private static function requestPayment(Session $session, array $config)
+    public static function requestPayment(Session $session, array $config)
     {
         $hostName = Context::$HOST_NAME;
         $shop = $session->getShop();
@@ -127,7 +124,7 @@ class EnsureBilling
             throw new ShopifyBillingException("Error while billing the store", $data["userErrors"]);
         }
 
-        return $data["confirmationUrl"];
+        return $data;
     }
 
     private static function requestRecurringPayment(Session $session, array $config, string $returnUrl): array
@@ -237,6 +234,9 @@ class EnsureBilling
             test: $test
         ) {
             confirmationUrl
+            appSubscription {
+              id
+            }
             userErrors {
                 field, message
             }

@@ -76,12 +76,16 @@ Route::get('/api/auth/callback', function (Request $request) {
 
     $redirectUrl = Utils::getEmbeddedAppUrl($host);
     if (Config::get('shopify.billing.required')) {
-        list($hasPayment, $confirmationUrl) = EnsureBilling::check($session, Config::get('shopify.billing'));
+		if($session->db_session->subscribed_package === "free"){
+			return redirect($redirectUrl . '/dashboard');
+		} else {
+			$hasPayment = EnsureBilling::check($session, Config::get('shopify.billing'));
+		}
 
-        if (!$hasPayment) {
-            $redirectUrl = $confirmationUrl;
-        }
-    }
+		if (!$hasPayment) {
+			return redirect($redirectUrl . '/pricing-plan');
+		}
+	}
 
     return redirect($redirectUrl);
 });

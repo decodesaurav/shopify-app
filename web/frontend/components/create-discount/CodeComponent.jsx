@@ -12,7 +12,7 @@ import { useRandomTextGenerator } from '../../hooks/discount-code/generateRandom
 
 export function CodeComponent({numberOfCodeDiscount, setNumberOfCodeDiscount, onPrefixChange, onSuffixChange}) {
 	const {t} = useTranslation();
-	const { handleTextChange, validateTitle, validateError } = useValidation();
+	const { handleTextChange, validatePrefix, validateError } = useValidation();
 	const [textFieldValuePrefix, setTextFieldValuePrefix] = useState('');
 	const [textFieldValueSuffix, setTextFieldValueSuffix] = useState('');
 	const [titleErrorPrefix, setTitleErrorPrefix] = useState('');
@@ -28,14 +28,14 @@ export function CodeComponent({numberOfCodeDiscount, setNumberOfCodeDiscount, on
 	const handleFieldChange = useCallback((newValue, setFieldText, setTitleError, onChange) => {
 		setFieldText(newValue);
 		handleTextChange(newValue);
-		validateTitle(newValue, setTitleError);
+		validatePrefix(newValue, setTitleError);
 		// Assuming onChange function updates validation error state
 		if(!validateError(newValue)){
 			onChange(newValue)
 		} else {
 			onChange(validateError(newValue));
 		}
-	}, [handleTextChange, validateTitle, validateError]);
+	}, [handleTextChange, validatePrefix, validateError]);
 
 
 	return(

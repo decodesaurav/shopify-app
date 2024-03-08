@@ -13,6 +13,7 @@ use Illuminate\Support\Facades\Config;
 use Shopify\Clients\Graphql;
 use Shopify\Context;
 use Shopify\Utils;
+use Illuminate\Support\Facades\Route;
 
 class EnsureShopifySession
 {
@@ -59,19 +60,28 @@ class EnsureShopifySession
         }
 
         if ($session && $session->isValid()) {
-            if (Config::get('shopify.billing.required')) {
+            if (Config::get('shopify.billing.required') && !in_array(Route::current()->getName(), ['check-pricing', 'confirm-pricing'])) {				
                 // The request to check billing status serves to validate that the access token is still valid.
-                try {
-                    list($hasPayment, $confirmationUrl) =
-                        EnsureBilling::check($session, Config::get('shopify.billing'));
-                    $proceed = true;
-
-                    if (!$hasPayment) {
-                        return TopLevelRedirection::redirect($request, $confirmationUrl);
-                    }
-                } catch (ShopifyBillingException $e) {
-                    $proceed = false;
-                }
+				try {
+					$current_package = $session->db_session->subscribed_package;
+					if($current_package === null) {
+						return response(['redirectToPricing' => true]);
+					}
+					if($current_package !== "free"){
+						$current_package = 'early_adopter_recurring_charge_1_99';
+						$hasPayment =
+                        EnsureBilling::check($session, Config::get('shopify.billing')[$current_package]);
+                    	$proceed = true;
+						if (!$hasPayment) {
+							return response(['redirectToPricing' => true]);
+						}
+					} else {
+						$proceed = true;
+						return response(['redirectToPricing' => false]);
+					}
+				} catch (ShopifyBillingException $e) {
+					$proceed = false;
+				}
             } else {
                 // Make a request to ensure the access token is still valid. Otherwise, re-authenticate the user.
                 $client = new Graphql($session->getShop(), $session->getAccessToken());

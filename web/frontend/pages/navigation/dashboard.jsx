@@ -1,18 +1,20 @@
 import React, { useEffect, useState } from 'react';
 import { AppProvider, Page, Grid, LegacyCard, Card, Text, Layout, Icon } from '@shopify/polaris';
 import { useApiCall } from '../../hooks/apiUtils';
-import {
-	AlertMinor, DiamondAlertMajor
-  } from '@shopify/polaris-icons';
+import {useNavigate} from 'react-router-dom';
 
 export default function Dashboard() {
 	const [discounts, setDashboardData ] = useState([]);
 	const makeApiCall = useApiCall();
+	const navigate = useNavigate();
+
 	useEffect(() => {
 		const handleGenerateDiscountCodes = async () => {
 			const endpoint = '/api/get-dashboard-data';
-			const { data, error, count } = await makeApiCall(endpoint, 'get');
-			console.log(data.data);
+			const { data, error, count, redirectToPricing } = await makeApiCall(endpoint, 'get');
+			if(redirectToPricing){
+				return navigate('/pricing-plan');
+			}
 			if (error) {
 				console.log('Error: ', error);
 			} else {

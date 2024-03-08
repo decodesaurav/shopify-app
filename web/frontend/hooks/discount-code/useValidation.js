@@ -20,6 +20,13 @@ const useValidation = () => {
     	setTitleError(isValid ? '' : `Please use only letters, numbers, and spaces for the ${value}`);
 	}
   }, []);
+  const validatePrefix = useCallback((value, setTitleError) => {
+
+    const regex = /^[a-zA-Z0-9\s]*$/;
+    const isValid = regex.test(value);
+
+    setTitleError(isValid ? '' : `Please use only letters, numbers, and spaces for the ${value}`);
+  }, []);
 
   const validateError = useCallback((value) => {
 
@@ -39,7 +46,8 @@ const useValidation = () => {
     titleError,
     handleTextChange,
     validateTitle,
-	validateError
+	validateError,
+	validatePrefix
   };
 };
 

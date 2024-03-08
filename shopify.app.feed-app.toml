@@ -2,7 +2,7 @@
 
 client_id = "ae7ec1a608904c8460207757b61c9d38"
 name = "feed-app"
-application_url = "https://advice-controlling-nl-rights.trycloudflare.com"
+application_url = "https://studio-principles-licking-secondary.trycloudflare.com"
 embedded = true
 
 [build]
@@ -12,13 +12,13 @@ include_config_on_deploy = true
 
 [access_scopes]
 # Learn more at https://shopify.dev/docs/apps/tools/cli/configuration#access_scopes
-scopes = "write_products,read_price_rules,write_price_rules,write_discounts"
+scopes = "read_price_rules,write_discounts,write_price_rules,write_products"
 
 [auth]
 redirect_urls = [
-  "https://advice-controlling-nl-rights.trycloudflare.com/auth/callback",
-  "https://advice-controlling-nl-rights.trycloudflare.com/auth/shopify/callback",
-  "https://advice-controlling-nl-rights.trycloudflare.com/api/auth/callback"
+  "https://studio-principles-licking-secondary.trycloudflare.com/auth/callback",
+  "https://studio-principles-licking-secondary.trycloudflare.com/auth/shopify/callback",
+  "https://studio-principles-licking-secondary.trycloudflare.com/api/auth/callback"
 ]
 
 [webhooks]

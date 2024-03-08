@@ -15,6 +15,7 @@ import {
 import {useState, useCallback, useEffect} from 'react';
 import _debounce from 'lodash/debounce';
 import { useApiCall } from '../../hooks/apiUtils';
+import {useNavigate} from 'react-router-dom';
 
   
 export default function IndexTableWithViewsSearchFilterSorting() {
@@ -49,6 +50,7 @@ export default function IndexTableWithViewsSearchFilterSorting() {
 		setQueryValue('');
 		fetchData(currentPage);
 	};
+	const navigate = useNavigate();
 	const onHandleCancel = () => {};
 
 	const handleFiltersQueryChange = useCallback(
@@ -79,7 +81,12 @@ export default function IndexTableWithViewsSearchFilterSorting() {
 			  selected === 0
 				? `/api/get-all-discounts?search=${value}&sort=${sortSelected}&page=${page}`
 				: `/api/get-failed-discounts?search=${value}&sort=${sortSelected}&page=${page}`;
-			const { data, error, count } = await makeApiCall(endpoint, 'get');
+			const { data, error, count, redirectToPricing } = await makeApiCall(endpoint, 'get');
+
+			if(redirectToPricing){
+				return navigate('/pricing-plan');
+			}
+
 			if (error) {
 			  console.error('Error: ', error);
 			} else {
@@ -99,7 +106,12 @@ export default function IndexTableWithViewsSearchFilterSorting() {
 			selected === 0
 			? `/api/get-all-discounts?sort=${sortSelected}&page=${page}`
 			: `/api/get-failed-discounts?sort=${sortSelected}&page=${page}`;
-		const { data, error, count } = await makeApiCall(endpoint, 'get');
+		const { data, error, count, redirectToPricing } = await makeApiCall(endpoint, 'get');
+
+		if(redirectToPricing){
+			return navigate('/pricing-plan');
+		}
+
 		if (error) {
 			console.error('Error: ', error);
 		} else {
