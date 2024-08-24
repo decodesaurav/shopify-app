@@ -20,7 +20,7 @@ class GenerateDiscountCodes extends Controller {
 		return response()->json([
 			'status' => 200,
 			'success' => true,
-			'data' => $generateDiscountCode
+			'data' => json_decode($generateDiscountCode->getContent())
 		]);
 	}
 
@@ -49,4 +49,3 @@ class GenerateDiscountCodes extends Controller {
 		]);
 	}
 }
-?>

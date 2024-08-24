@@ -23,7 +23,7 @@ const FAQPage = () => {
       id: 1,
       question: 'How does the App Work?',
       answer:
-        'We have different fields on our "Create Discount" page. You need to fill all the necessary fields, and then the create discount field is enabled. After creating the discount batch, discount codes are posted on the selected Shopify Discount.',
+        'We have different fields on our "Create Discount" page. You need to fill all the necessary fields (Batch Name, Discount to Map in shopify, and number of codes to generate). Only after entering required fields "Create discount" button is enabled. After creating the discount batch, discount codes are posted on the selected Shopify Discount.',
     },
     {
       id: 2,
@@ -31,6 +31,19 @@ const FAQPage = () => {
       answer:
         'You need to enter the name of the discount batch, and after that, you are required to select the Shopify Discount to which you\'re going to post the discount codes. You can choose the number of codes you want to generate, and also, you can choose what type of code you want as well.',
     },
+	{
+		id: 3,
+		question: 'What is Advanced Code Pattern?',
+		answer:
+			'Advanced Code pattern is advanced feature provided to meet the custom requirement of code. First, You should check the Advanced Code Pattern at the Bottom of "Create Discount" Page. And in the pattern field, you need to enter the pattern in either of [N],[LN],[L] format where L is letter and N is number and LN is combination of number and letter.',
+	},
+	{
+		id: 4,
+		question: 'How do I use Advanced Code Pattern?',
+		answer:
+			'For example you  want to enter code like "hello182" then you can type hello[3N] in Pattern field. Also you want 112-wow-50%off then you can type [3N]-[3L]-50%off. And if you want combination of letters and number, you can use [3NL]"your-code."',
+	},
+
     // Add FAQ here, will make separate dashboard for CRUD operation
   ];
 
@@ -50,15 +63,7 @@ const FAQPage = () => {
                       cursor: 'pointer',
                     }}
                   >
-                    <Button
-                      plain
-                      ariaExpanded={expanded[faq.id]}
-                      monochrome={true}
-                      removeUnderline={true}
-                      textAlign="left"
-                    >
                     <strong>{faq.question}</strong>
-                    </Button>
                     <div style={{ marginLeft: 'auto' }}>
                       <Button
                         plain

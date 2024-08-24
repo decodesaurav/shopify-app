@@ -24,12 +24,11 @@ class CreateDiscountCodesTable extends Migration
 			$table->string('map_to_shopify_discount', 50);
 			$table->string('price_rule', 20);
 			$table->boolean('is_advanced_checked');
-			$table->boolean('has_field_value_pattern');
+			$table->char('has_field_value_pattern',50);
 			$table->foreignId('shopify_session_id')	->constrained('sessions')
 													->onDelete('cascade')
-													->onUpdate('cascade')
 													->index();
-			$table->boolean('is_published_to_shopify');
+			$table->char('is_published_to_shopify',10);
 			$table->timestamps();
         });
     }

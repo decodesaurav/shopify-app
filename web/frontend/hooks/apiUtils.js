@@ -17,7 +17,7 @@ export const useApiCall = () => {
 		...(method === 'POST' ? { body: JSON.stringify(data) } : {})
 	  });
 	  const responseData = await response.json();
-	  console.log(responseData)
+	  console.log(responseData.data)
       return { data: responseData.data, count: responseData.count, error: null, redirectToPricing: responseData.redirectToPricing };
     } catch (error) {
       return { data: null, count:null, error };

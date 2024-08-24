@@ -2,10 +2,14 @@
 
 namespace App\Providers;
 
+use App\Events\DiscountPublished;
+use App\Listeners\SendDiscountPublishedNotification;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Auth\Listeners\SendEmailVerificationNotification;
 use Illuminate\Foundation\Support\Providers\EventServiceProvider as ServiceProvider;
 use Illuminate\Support\Facades\Event;
+
+use function Illuminate\Events\queueable;
 
 class EventServiceProvider extends ServiceProvider
 {
@@ -27,6 +31,8 @@ class EventServiceProvider extends ServiceProvider
      */
     public function boot()
     {
-        //
+        Event::listen(queueable(function(DiscountPublished $discount){
+			//
+		})->onConnection('redis')->onQueue('DiscountNotification'));
     }
 }

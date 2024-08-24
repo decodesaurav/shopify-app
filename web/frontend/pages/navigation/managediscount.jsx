@@ -16,10 +16,12 @@ import {useState, useCallback, useEffect} from 'react';
 import _debounce from 'lodash/debounce';
 import { useApiCall } from '../../hooks/apiUtils';
 import {useNavigate} from 'react-router-dom';
+import { useAppQuery } from '../../hooks';
 
   
 export default function IndexTableWithViewsSearchFilterSorting() {
 	const [loading, setLoading] = useState(true);
+	const [initialLoad, setInitialLoad] = useState(true);
 	const [totalCount, setTotalCount] = useState(0);
 	const [itemStrings, setItemStrings] = useState([
 	  'All',
@@ -66,6 +68,8 @@ export default function IndexTableWithViewsSearchFilterSorting() {
 		setSortSelected(sortOption);
 	};
 
+	const handleSetSelected = useCallback((newValue) => setSelected(newValue) , [selected]);
+
 	const filters = [];
 
 	const appliedFilters = [];
@@ -76,13 +80,13 @@ export default function IndexTableWithViewsSearchFilterSorting() {
 	};
 	const debounceFetchData = _debounce(
 		async (value, page) => {
+		setLoading(true)
 		  try {
 			const endpoint =
 			  selected === 0
 				? `/api/get-all-discounts?search=${value}&sort=${sortSelected}&page=${page}`
 				: `/api/get-failed-discounts?search=${value}&sort=${sortSelected}&page=${page}`;
 			const { data, error, count, redirectToPricing } = await makeApiCall(endpoint, 'get');
-
 			if(redirectToPricing){
 				return navigate('/pricing-plan');
 			}
@@ -90,6 +94,7 @@ export default function IndexTableWithViewsSearchFilterSorting() {
 			if (error) {
 			  console.error('Error: ', error);
 			} else {
+				console.log(data)
 			  setOrders(data);
 			  setTotalCount(count);
 			}
@@ -102,12 +107,13 @@ export default function IndexTableWithViewsSearchFilterSorting() {
 
 	const fetchData = async (page) => {
 		try {
+		setLoading(true)
+		console.log(page)
 		const endpoint =
 			selected === 0
 			? `/api/get-all-discounts?sort=${sortSelected}&page=${page}`
 			: `/api/get-failed-discounts?sort=${sortSelected}&page=${page}`;
 		const { data, error, count, redirectToPricing } = await makeApiCall(endpoint, 'get');
-
 		if(redirectToPricing){
 			return navigate('/pricing-plan');
 		}
@@ -120,6 +126,7 @@ export default function IndexTableWithViewsSearchFilterSorting() {
 		}
 		} finally {
 			setLoading(false);
+			setInitialLoad(false)
 		}
 	};
 
@@ -127,18 +134,34 @@ export default function IndexTableWithViewsSearchFilterSorting() {
 		const nextPage = currentPage + 1;
 		console.log(nextPage)
 		setCurrentPage(nextPage);
-		fetchData(nextPage);
+		debounceFetchData(queryValue, nextPage);
 	};
 	const handlePreviousPage = () => {
 		const previousPage = currentPage - 1;
 		console.log(previousPage)
 		setCurrentPage(previousPage);
-		fetchData(previousPage);
+		debounceFetchData(queryValue, previousPage);
 	};
 
-	useEffect(() => {
-		fetchData(currentPage);
-	}, [selected, sortSelected, currentPage]);
+	useAppQuery({
+		url: `/api/get-all-discounts?sort=${sortSelected}&page=${1}`,
+		reactQueryOptions: {
+		  onSuccess: (data) => {
+			console.log(data)
+			if(data.redirectToPricing){
+				navigate('/pricing-plan')
+			} else{
+				setOrders(data.data)
+				setInitialLoad(false)
+				setLoading(false)
+			}
+		  },
+		},
+	});
+
+	useEffect(() =>{
+		fetchData(currentPage)
+	},[selected]);
   
 	const rowMarkup = orders.map(
 	  (
@@ -157,26 +180,30 @@ export default function IndexTableWithViewsSearchFilterSorting() {
 			</Text>
 		  </IndexTable.Cell>
 		  <IndexTable.Cell>{shopifyDiscountTitle}</IndexTable.Cell>
-		  <IndexTable.Cell>{codePrefix}</IndexTable.Cell>
-		  <IndexTable.Cell>{codeSuffix}</IndexTable.Cell>
+		  <IndexTable.Cell>{(codePrefix !== "0" ? codePrefix  : "not used")}</IndexTable.Cell>
+		  <IndexTable.Cell>{(codeSuffix !== "0" ? codeSuffix  : "not used")}</IndexTable.Cell>
 		  <IndexTable.Cell>
-				{remarks === 0 ? (
-					<Badge progress="incomplete" tone="critical">
-					Failed
-					</Badge>
-				) : (
-					<Badge progress="complete" tone="attention">
-					Published
-					</Badge>
-				)}
+		  {remarks === "failed" ? (
+			<Badge progress="incomplete" tone="critical">
+				Failed
+			</Badge>
+			) : remarks === "processing" ? (
+			<Badge progress="complete" tone="attention">
+				Processing
+			</Badge>
+			) : (
+			<Badge progress="complete" tone="success">
+				Published
+			</Badge>
+			)}
 			</IndexTable.Cell>
 		</IndexTable.Row>
-	  ),
+	  )
 	);
   
 	return (
 		<>
-		{!loading ? (
+		{!initialLoad ? (
 		<Page title="Discount Batches">
 			<Layout.Section>
 			<LegacyCard>
@@ -196,7 +223,7 @@ export default function IndexTableWithViewsSearchFilterSorting() {
 				}}
 				tabs={tabs}
 				selected={selected}
-				onSelect={setSelected}
+				onSelect={handleSetSelected}
 				canCreateNewView={false}
 				filters={filters}
 				appliedFilters={appliedFilters}
@@ -229,19 +256,17 @@ export default function IndexTableWithViewsSearchFilterSorting() {
 			</LegacyCard>
 			<div style={{ display: 'flex', margin: '10px', justifyContent: 'end' }}>
 				<Pagination
-				hasPrevious={currentPage > 1}
-				onPrevious={handlePreviousPage}
-				hasNext={currentPage * 15 < totalCount}
-				onNext={handleNextPage}
-				label={`${(currentPage - 1) * 15 + 1}-${currentPage * 15} of ${totalCount} Batches`}
+					hasPrevious={currentPage > 1}
+					onPrevious={handlePreviousPage}
+					hasNext={currentPage * 15 < totalCount}
+					onNext={handleNextPage}
+					label={`${(currentPage - 1) * 15 + 1}-${currentPage * 15} of ${totalCount} Batches`}
 				/>
 			</div>
 			</Layout.Section>
 		</Page>
 		) : (
-		<SkeletonBodyText>
-			{/* Your skeleton or loading state content */}
-		</SkeletonBodyText>
+		<SkeletonBodyText lines={5} />
 		)}
 	</>
 );

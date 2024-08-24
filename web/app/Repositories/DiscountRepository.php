@@ -9,6 +9,7 @@ use App\Services\DataPreparationService;
 use Carbon\Carbon;
 use Exception;
 use Illuminate\Support\Facades\DB;
+use App\Models\Session;
 
 class DiscountRepository implements DiscountRepositoryInterface {
 	public function saveDiscountToDB($discountData){
@@ -68,7 +69,7 @@ class DiscountRepository implements DiscountRepositoryInterface {
 
 	public function fetchFailedDiscountFromDB($shop_data, $sortBy, $searchQuery, $currentPage){
 		try{
-			$query = DiscountCodes::where('shopify_session_id', $shop_data['id'])->where('is_published_to_shopify', 0);
+			$query = DiscountCodes::where('shopify_session_id', $shop_data['id'])->where('is_published_to_shopify', 'failed');
 			$countQuery = clone $query;
 			if(empty($searchQuery)){
 				$failedDiscountBatch = $query->orderBy('created_at', $sortBy)->paginate(getenv('PER_PAGE_PAGINATE'), ['*'], 'page', $currentPage);
@@ -131,14 +132,26 @@ class DiscountRepository implements DiscountRepositoryInterface {
 
 	public function fetchDashboardData($data){
 		try{
-			$discountUploadedSuccessfully = DiscountCodes::where('shopify_session_id', $data['id'])
-															->where('is_published_to_shopify', 1)
-															->count();
-			$countDiscountFailed = DiscountCodes::where('shopify_session_id', $data['id'])
-												->where('is_published_to_shopify', 0)
-												->count();
-			$uploadLimit = "Unlimited";
-			$currentPlan = "FREE";
+			$commonConditions = [
+				'shopify_session_id' => $data['id'],
+			];
+			
+			$discounts = DiscountCodes::with('session')->where($commonConditions)->get();
+			foreach ($discounts as $discount) {
+				$subscribed_package = $discount->session->subscribed_package ? $discount->session->subscribed_package : null;
+			}
+			
+			$discountUploadedSuccessfully = $discounts->where('is_published_to_shopify', 'published')->count();
+			
+			$countDiscountFailed = $discounts->where('is_published_to_shopify', 'failed')->count();			
+			
+			if($subscribed_package == "free_plan"){
+				$uploadLimit = 10;
+				$currentPlan = "FREE";
+			} else {
+				$uploadLimit = "Unlimited";
+				$currentPlan = "Early Bird";
+			}
 
 			$dataToBeSent = [
 				"discountUploadedSuccessfully" => $discountUploadedSuccessfully,

@@ -79,11 +79,18 @@ class FetchDiscountForShop extends Controller {
 		try{
 			$shopifyStore = $request->get('shopifySession')->db_session;
 			$getDashboardData = $this->repository->fetchDashboardData($shopifyStore);
-			$response = json_decode($getDashboardData->getContent());
-			return response()->json([
-				'success' => true,
-				'data' => $response
-			]);
+			if(!empty($getDashboardData)){
+				$response = json_decode($getDashboardData->getContent());
+				return response()->json([
+					'success' => true,
+					'data' => $response
+				]);
+			} else {
+				return response()->json([
+					'success' => false,
+					'data'=> false
+				]);
+			}
 		} catch (Exception $e){
 			logger("Error while fetching dashboard data from DB" . $e->getMessage());
 		}

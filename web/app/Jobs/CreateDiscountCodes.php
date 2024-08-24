@@ -2,6 +2,9 @@
 
 namespace App\Jobs;
 
+use App\Models\DiscountCodes;
+use App\Models\Session;
+use App\Traits\ApiResponseTrait;
 use Illuminate\Bus\Batchable;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldBeUnique;
@@ -14,7 +17,7 @@ use Shopify\Clients\Graphql;
 
 class CreateDiscountCodes implements ShouldQueue
 {
-    use Batchable, Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
+    use Batchable, Dispatchable, InteractsWithQueue, Queueable, SerializesModels, ApiResponseTrait;
 	protected $codes;
 	protected $discountId;
 	protected $shopifySession;
@@ -34,7 +37,7 @@ class CreateDiscountCodes implements ShouldQueue
 				message
 			}
 		}
-		}
+	}
 	GRAPHQL;
 
     /**
@@ -70,7 +73,6 @@ class CreateDiscountCodes implements ShouldQueue
 			if ($response->getStatusCode() !== 200) {
 				Log::channel('daily')->error('Failed to create discount codes for ' . $this->shopifySession->shop );
 			} else {
-				return response()
 				Log::channel("daily")->info("Data :" . json_encode($response->getBody()));
 			}
 		} catch (\Exception $e){

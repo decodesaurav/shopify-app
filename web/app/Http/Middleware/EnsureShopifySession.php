@@ -67,7 +67,7 @@ class EnsureShopifySession
 					if($current_package === null) {
 						return response(['redirectToPricing' => true]);
 					}
-					if($current_package !== "free"){
+					if($current_package !== "free_plan"){
 						$current_package = 'early_adopter_recurring_charge_1_99';
 						$hasPayment =
                         EnsureBilling::check($session, Config::get('shopify.billing')[$current_package]);
@@ -77,7 +77,6 @@ class EnsureShopifySession
 						}
 					} else {
 						$proceed = true;
-						return response(['redirectToPricing' => false]);
 					}
 				} catch (ShopifyBillingException $e) {
 					$proceed = false;

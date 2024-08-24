@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { AppProvider, Page, Grid, LegacyCard, Card, Text, Layout, Icon } from '@shopify/polaris';
+import { AppProvider, Page, Grid, LegacyCard, Card, Text, Layout, Spinner } from '@shopify/polaris';
 import { useApiCall } from '../../hooks/apiUtils';
 import {useNavigate} from 'react-router-dom';
 
@@ -7,9 +7,11 @@ export default function Dashboard() {
 	const [discounts, setDashboardData ] = useState([]);
 	const makeApiCall = useApiCall();
 	const navigate = useNavigate();
+	const [loading, setLoading] = useState(false);
 
 	useEffect(() => {
 		const handleGenerateDiscountCodes = async () => {
+			setLoading(true)
 			const endpoint = '/api/get-dashboard-data';
 			const { data, error, count, redirectToPricing } = await makeApiCall(endpoint, 'get');
 			if(redirectToPricing){
@@ -17,8 +19,12 @@ export default function Dashboard() {
 			}
 			if (error) {
 				console.log('Error: ', error);
-			} else {
+			} 
+			if(data){
+				setLoading(false)
 				setDashboardData(data.data);
+			} else {
+				setLoading(false)
 			}
 		};
 		handleGenerateDiscountCodes();
@@ -46,17 +52,23 @@ export default function Dashboard() {
         <Grid>
           <Grid.Cell columnSpan={{ xs: 4, sm: 4, md: 4, lg: 4, xl: 4 }}>
             <LegacyCard title="Discounts Uploaded" sectioned>
-              <p>{discounts.discountUploadedSuccessfully}</p>
+              <p>{loading ? (
+					<Spinner size="small" color="teal" />
+					) :( discounts.discountUploadedSuccessfully ? discounts.discountUploadedSuccessfully : 0 )}</p>
             </LegacyCard>
           </Grid.Cell>
           <Grid.Cell columnSpan={{ xs: 4, sm: 4, md: 4, lg: 4, xl: 4 }}>
             <LegacyCard title="Discount Failed" sectioned>
-              <p>{discounts.countDiscountFailed}</p>
+              <p>{loading ? (
+					<Spinner size="small" color="teal" />
+					) : discounts.countDiscountFailed ? discounts.countDiscountFailed : 0 }</p>
             </LegacyCard>
           </Grid.Cell>
           <Grid.Cell columnSpan={{ xs: 4, sm: 4, md: 4, lg: 4, xl: 4 }}>
             <LegacyCard title="Upload Remaining" sectioned>
-              <p>{discounts.uploadLimit}</p>
+              <p>{loading ? (
+					<Spinner size="small" color="teal" />
+					) : (isNaN(discounts.uploadLimit) ? "Unlimited" : (discounts.uploadLimit - discounts.discountUploadedSuccessfully))}</p>
             </LegacyCard>
           </Grid.Cell>
         </Grid>
@@ -68,12 +80,16 @@ export default function Dashboard() {
         <Grid>
           <Grid.Cell columnSpan={{ xs: 4, sm: 4, md: 4, lg: 4, xl: 4 }}>
             <LegacyCard title="Current Plan" sectioned>
-              <p>{discounts.currentPlan}</p>
+              <p>{loading ? (
+					<Spinner size="small" color="teal" />
+					) : discounts.currentPlan}</p>
             </LegacyCard>
           </Grid.Cell>
           <Grid.Cell columnSpan={{ xs: 4, sm: 4, md: 4, lg: 4, xl: 4 }}>
             <LegacyCard title="Discount Upload Limit" sectioned>
-              <p>{discounts.uploadLimit}</p>
+              <p>{loading ? (
+					<Spinner size="small" color="teal" />
+					) : discounts.uploadLimit ? discounts.uploadLimit : "Unlimited"}</p>
             </LegacyCard>
           </Grid.Cell>
         </Grid>

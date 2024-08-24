@@ -13,13 +13,14 @@ class CreateDiscountRulesTable extends Migration
      */
     public function up()
     {
-        Schema::create('discount_rules', function (Blueprint $table) {
-            $table->id();
+		Schema::create('discount_rules', function (Blueprint $table) {
+			$table->id();
 			$table->char('discount_rule_id');
 			$table->char('discount_name');
-			$table->integer('shopify_session_id');
-            $table->timestamps();
-        });
+			$table->unsignedBigInteger('shopify_session_id');
+			$table->foreign('shopify_session_id')->references('id')->on('sessions')->onDelete('cascade');
+			$table->timestamps();
+		});		
     }
 
     /**

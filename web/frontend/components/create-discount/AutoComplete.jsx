@@ -4,6 +4,7 @@ import {useNavigate} from 'react-router-dom';
 import { useState, useCallback, useEffect } from 'react';
 import { useApiCall } from '../../hooks/apiUtils';
 import _debounce from 'lodash/debounce';
+import { useAppQuery } from '../../hooks';
 
 export function SelectDiscount({ onSelectionChange, labelValue }) {
   const [selectedOptions, setSelectedOptions] = useState([]);
@@ -80,31 +81,23 @@ const debouncedUpdateText =  _debounce(
     />
   );
 
-  useEffect(() => {
-    const fetchDiscountOptions = async () => {
-      try {
-        const { data, error, redirectToPricing } = await makeApiCall('/api/get-discount-for-shop', 'get');
-		
-		if(redirectToPricing){
+useAppQuery({
+	url: `/api/get-discount-for-shop`,
+	reactQueryOptions: {
+	  onSuccess: (data) => {
+		console.log(data)
+		if(data.redirectToPricing){
 			return navigate('/pricing-plan');
 		}
-        if (error) {
-          console.log('Error: ', error);
-        } else {
-          const formattedOptions = data.map((item) => ({
+		const formattedOptions = data.data.map((item) => ({
             value: item.discount_rule_id,
             label: item.discount_name,
-          }));
+        }));
 
-          setOptions(formattedOptions);
-        }
-      } catch (error) {
-        console.error('Error fetching data:', error);
-      }
-    };
-
-    fetchDiscountOptions();
-  }, []);
+        setOptions(formattedOptions);
+	  },
+	},
+});
 
   return (
     <Autocomplete

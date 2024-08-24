@@ -4,18 +4,22 @@ import {Layout,
 		TextField,
 		RadioButton,
 		OptionList,
-		Link
+		Link,
+		Spinner,
+		Banner
 } from '@shopify/polaris';
 import {React,useState, useCallback} from 'react';
 import { useApiCall } from '../../hooks/apiUtils';
 import { useTranslation } from 'react-i18next';
 import {CodeComponent } from '../../components/create-discount/CodeComponent';
-import AdvancedSetting from '../../components/create-discount/AdvancedSetting';
 import AdvancedCodeComponent from '../../components/create-discount/AdvancedCodeComponent';
 import TitleComponent from '../../components/create-discount/DiscountDetails';
 import SummaryComponent from '../../components/create-discount/SummaryComponent';
 import { SelectDiscount } from '../../components/create-discount/AutoComplete';
 import {useNavigate} from 'react-router-dom';
+import { Toast } from '@shopify/app-bridge-react';
+import { isEmpty } from 'lodash';
+import { useAppQuery } from '../../hooks';
 
 export default function CreateDiscount() {
 	const {t} = useTranslation();
@@ -23,7 +27,7 @@ export default function CreateDiscount() {
 	const [textErrorFromChild, setTextErrorFromChild] = useState(true);
 	const [textFieldValuePrefixParent, setTextFieldValuePrefix] = useState(false);
   	const [textFieldValueSuffixParent, setTextFieldValueSuffix] = useState(false);
-	const [numberOfCode, setNumberOfCode] = useState(100);
+	const [numberOfCode, setNumberOfCode] = useState();
 	const [numberOfCodeDiscount, setNumberOfCodeDiscount] = useState(1);
 	const [textFieldValuePattern, setTextFieldValuePattern] = useState('');
 	const [advancedCheckValue, setAdvancedValue] = useState('');
@@ -31,17 +35,28 @@ export default function CreateDiscount() {
 	const [priorityOfDiscountCode, setPriorityOfDiscountCode ] = useState('normal');
 	const [selectedOptionsFromSelect, setSelectedOptionsFromSelect] = useState('');
 	const [selectedLabel, setSelectedLabel] = useState(1);
+	const [loading, setLoading] = useState(false);
+	const emptyToastProps = {content: null}
+	const [showToast, setShowToast] = useState(false);
+	const [checkIfPlanLimitReached, setForPlanLimit] = useState(false);
+	const [shouldNavigate, setShouldNavigate] = useState(false);
+
+	const handleUpgradeClick = () => {
+		setShouldNavigate(true);
+		navigate('/pricing-plan');
+	};
+
 	const navigate = useNavigate();
-
-
 	const radioChange = useCallback((_, newValue) => setValue(newValue), []);
-	const handleDiscountCodeChange = useCallback((newValue) =>{
-	const validValue = Math.min(1000, Math.max(1, newValue));
-		setNumberOfCode(validValue);
+	const handleDiscountCodeChange = useCallback((newValue) => {
+		let validValue = isNaN(newValue) ? '' : Math.max(0, Number(newValue));
+	  
+		setNumberOfCode(validValue === 0 ? '' : validValue.toString());
 	}, []);
+		
 	const handleAdvancedRadioChange = useCallback((_, selected) => setAdvancedValue(selected), []);
 	const handleFieldValuePattern = useCallback((newValue) => setTextFieldValuePattern(newValue) , []);
-	const popupHandler = useCallback(() => setModalValueActive((active) => !active), []);
+	const popupHandler = useCallback(() => setModalValueActive((active) => !active), [setModalValueActive]);
 
 	const handleSelectionChange = (selectedOptions) => {
 		setSelectedOptionsFromSelect(selectedOptions);
@@ -59,16 +74,17 @@ export default function CreateDiscount() {
 		setTextFieldValueSuffix(newValue);
 	};
 
-	const setPriorityQueue = (newValue) => {
-		setPriorityOfDiscountCode(newValue);
-	}
-
 	const handleTextErrorChange = (error) => {
 		setTextErrorFromChild(error);
 	}
 	const makeApiCall = useApiCall();
+	const toastMarkup = showToast ?
+		<Toast content="Discount Codes is being uploaded" onDismiss={() => setShowToast(emptyToastProps)}/> :
+	null;
 
 	const handleGenerateDiscountCodes = async () => {
+		setLoading(true);
+		setShowToast(false)
 		const data = {
 			value,
 			textFieldValuePrefixParent,
@@ -83,28 +99,64 @@ export default function CreateDiscount() {
 			selectedLabel
 		}
 		const { data: responseData, error, redirectToPricing } = await makeApiCall('/api/generate-discount-codes', 'POST', data);
-
+		setLoading(false);
 		if(redirectToPricing){
 			return navigate('/pricing-plan');
 		}
-
+		if(responseData.result.hasUpdatedDataBase){
+			setShowToast(true)
+			setTimeout(() => {
+				return navigate('/navigation/managediscount')
+			}, 2000);
+		}
 		if (error) {
 			console.log('Error: ', error);
-		} else {
-			console.log(responseData);
 		}
 	};
+	useAppQuery({
+		url: `/api/get-dashboard-data`,
+		reactQueryOptions: {
+		  onSuccess: (data) => {
+			if(data.success){
+				let uploadRemaining = data.data.data.uploadLimit - data.data.data.discountUploadedSuccessfully;
+				if(data.data.data.currentPlan === "FREE" && uploadRemaining == 0){
+					setForPlanLimit(true);
+				}
+			}
+		  },
+		},
+	});
 
 	return (
 		<Page
 			backAction={{content: 'Products', url: '/'}}
 			title={t("CreateDiscount.discount_title")}
 			primaryAction={{
-				content : t("generate_discount_codes"),
+				content: loading ? (
+					<Spinner size="small" color="teal" />
+				) : (
+					t('generate_discount_codes')
+				),
 				onAction: handleGenerateDiscountCodes,
-				disabled: ( textErrorFromChild || (selectedOptionsFromSelect=='') || (advancedCheckValue.length > 0 &&  textFieldValuePattern.length === 0)  )
-			}}			
+				disabled: ( textErrorFromChild || (selectedOptionsFromSelect=='') || (advancedCheckValue.length > 0 &&  textFieldValuePattern.length === 0) || isEmpty(numberOfCode) || checkIfPlanLimitReached  )
+			}}
 		>
+		{checkIfPlanLimitReached ? (
+			<div style={{ padding: '20px 0px 20px 0px' }}>
+				 <Banner onDismiss={() => setForPlanLimit(emptyToastProps)}>
+					<p>
+					Please{' '}
+					<Link
+						onClick={handleUpgradeClick}
+					>
+						upgrade your plan
+					</Link>{' '}
+					to upload more Discount Codes
+					</p>
+				</Banner>
+			</div>
+		) : (<div> </div>)}
+			{toastMarkup}
 		<Layout>
 			<Layout.Section>
 				<LegacyCard title="Discount details" sectioned>

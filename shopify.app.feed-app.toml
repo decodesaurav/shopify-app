@@ -2,7 +2,7 @@
 
 client_id = "ae7ec1a608904c8460207757b61c9d38"
 name = "feed-app"
-application_url = "https://studio-principles-licking-secondary.trycloudflare.com"
+application_url = "https://pet-computed-hartford-utilize.trycloudflare.com"
 embedded = true
 
 [build]
@@ -16,9 +16,9 @@ scopes = "read_price_rules,write_discounts,write_price_rules,write_products"
 
 [auth]
 redirect_urls = [
-  "https://studio-principles-licking-secondary.trycloudflare.com/auth/callback",
-  "https://studio-principles-licking-secondary.trycloudflare.com/auth/shopify/callback",
-  "https://studio-principles-licking-secondary.trycloudflare.com/api/auth/callback"
+  "https://pet-computed-hartford-utilize.trycloudflare.com/auth/callback",
+  "https://pet-computed-hartford-utilize.trycloudflare.com/auth/shopify/callback",
+  "https://pet-computed-hartford-utilize.trycloudflare.com/api/auth/callback"
 ]
 
 [webhooks]

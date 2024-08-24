@@ -76,7 +76,7 @@ Route::get('/api/auth/callback', function (Request $request) {
 
     $redirectUrl = Utils::getEmbeddedAppUrl($host);
     if (Config::get('shopify.billing.required')) {
-		if($session->db_session->subscribed_package === "free"){
+		if($session->db_session->subscribed_package === "free_plan"){
 			return redirect($redirectUrl . '/dashboard');
 		} else {
 			$hasPayment = EnsureBilling::check($session, Config::get('shopify.billing'));

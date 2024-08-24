@@ -21,6 +21,8 @@ export default function PricingPage() {
 	const [isLoadingEarlyBirdPlan, setIsLoadingEarlyBirdPlan] = useState(true);
 	const [hasPayment, setHasPayment] = useState(false);
 	const [hasFreePayment, setHasFreePayment] = useState(false);
+	const [checkIfSelectedPlan, setSeletedPlanForBanner] = useState(true);
+	const showNotification = {content: null}
 
 	useAppQuery({
 		url: `/api/check-pricing-status`,
@@ -29,12 +31,15 @@ export default function PricingPage() {
 			console.log(data);
 			if (data.result.hasPayment) {
 			  setHasPayment(true);
+			  setSeletedPlanForBanner(false)
 			}
 			if (data.result.hasFreePayment) {
 			  	setHasFreePayment(true);
+				setSeletedPlanForBanner(false)
 			}
 			if(data.result.hasNotAcceptedPayment){
 				setHasPayment(false);
+				setSeletedPlanForBanner(true)
 			}
 			setIsLoadingReleasePlan(false);
 			setIsLoadingEarlyBirdPlan(false);
@@ -67,10 +72,12 @@ export default function PricingPage() {
 		acceptPricingPlan("earlyBird").then((res) => {
 		  if (!res.success) {
 			setIsLoadingEarlyBirdPlan(false);
+			setSeletedPlanForBanner(true)
 		  } else {
 			setHasPayment(true)
 			setHasFreePayment(false);
 			setIsLoadingEarlyBirdPlan(false);
+			setSeletedPlanForBanner(false)
 		  }
 		});
 	  };
@@ -80,10 +87,12 @@ export default function PricingPage() {
 		acceptPricingPlan("release").then((res) => {
 		if (!res.success) {
 			setIsLoadingReleasePlan(false);
+			setSeletedPlanForBanner(true)
 		} else {
 			setHasFreePayment(true);
 			setHasPayment(false)
 			setIsLoadingReleasePlan(false);
+			setSeletedPlanForBanner(false)
 		}
 		});
 	};
@@ -95,13 +104,16 @@ export default function PricingPage() {
 
 	return (
 		<Page title="Subscription Page" full>
-			<div style={{ padding: '20px 0px 20px 0px' }}>
-				<Banner onDismiss={() => {}}>
+			{checkIfSelectedPlan ? (
+				<div style={{ padding: '20px 0px 20px 0px' }}>
+					<Banner onDismiss={() => setSeletedPlanForBanner(showNotification)}>
 					<p>
-						Please select a plan to proceed, else you'll be again redirected to this page.
+						Please select a plan to proceed, else you'll be redirected to this page again.
 					</p>
-				</Banner>
-			</div>
+					</Banner>
+				</div>
+			) : (<div> </div>)}
+
 		<SpacingBackground>
 			<InlineGrid gap={400} columns={2}>
 			<Card>
